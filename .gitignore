@@ -1,0 +1,7 @@
+env/
+.env
+nfl.db
+utils/nfl.db
+/utils/nfl.db
+node_modules/
+/node_modules/
