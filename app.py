@@ -9,23 +9,20 @@ from utils.answer_parser import get_answer
 from flask_socketio import SocketIO
 from flask_socketio import send, emit
 from utils.player_and_team import player_and_team_log_get_answer
+from utils.props import props_log_get_answer
 from utils.perplexity import ask_expert
 from flask import request
 from supabase import create_client, Client
 import dotenv
 import os
-
-
+import logging
 
 
 dotenv.load_dotenv()
 
 
-
-
 app = Flask(__name__)
-CORS(app) 
-
+CORS(app)
 
 
 # Initialize Supabase client
@@ -36,8 +33,7 @@ supabase: Client = create_client(supabase_url, supabase_key)
 
 socketio = SocketIO(app, cors_allowed_origins='*')
 
-global_bucket = None 
-
+global_bucket = None
 
 
 @socketio.on('billy')
@@ -51,7 +47,6 @@ def chat(data):
     print(data['message'])
 
     ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-
 
     message = data['message']['message']
 
@@ -70,9 +65,10 @@ def chat(data):
 
             print(f'Bucket: {bucket}')
             print(f'Question: {question}')
-            
-            if bucket =='Conversation':
-                emit('billy', {'response':question, 'type': 'answer', 'status': 'done'})
+
+            if bucket == 'Conversation':
+                emit('billy', {'response': question,
+                     'type': 'answer', 'status': 'done'})
                 return
 
             if bucket == 'NoBucket':
@@ -82,9 +78,9 @@ def chat(data):
                     return
 
                 emit('billy', {
-                        'response':question, 'type': 'answer', 'status': 'done'})
+                    'response': question, 'type': 'answer', 'status': 'done'})
                 return
-            
+
             if bucket == 'ExpertAnalysis':
                 emit('billy', {'response': '',
                                'type': 'query', 'status': 'generating'})
@@ -101,7 +97,7 @@ def chat(data):
                         generating_answer = False
                         emit('billy', {'response': next_answer,
                              'type': 'answer', 'status': 'done'})
-                        
+
                 return answer
 
             raw_query = None
@@ -115,9 +111,15 @@ def chat(data):
             elif bucket == 'TeamAndPlayerLog':
                 raw_query = player_and_team_log_get_answer(
                     'anthropic', question)
-            
+            elif bucket == 'Props':
+                raw_query = props_log_get_answer(
+                    'anthropic', question
+                )
+
+            print(bucket)
+
             print(f'Raw Query: {raw_query}')
-                
+
             if 'error' and 'cannot' in raw_query.lower():
                 emit('billy', {'response': '',
                                'type': 'query', 'status': 'generating'})
@@ -137,12 +139,11 @@ def chat(data):
 
                 return answer
 
-
             # Extract the SQL query from the raw_query
             query = extract_sql_query(raw_query)
 
             emit('billy', {'response': query,
-                    'type': 'query', 'status': 'generating'})
+                           'type': 'query', 'status': 'generating'})
 
             # Execute the SQL query
             result = execute_query(query)
@@ -152,8 +153,6 @@ def chat(data):
 
         except Exception as e:
             print(f'Error: {e}. Retrying...')
-
-   
 
     answer = get_answer('openai', question, query, result)
 
@@ -171,15 +170,14 @@ def chat(data):
 
             emit('billy', {'response': answer_string,
                  'type': 'answer', 'status': 'done'})
-            
-
 
     return answer_string
+
 
 @app.route('/store-query', methods=['POST'])
 def store_query():
     data = request.get_json()
-    
+
     if not data:
         return jsonify({'error': 'No data provided'}), 400
 
@@ -198,7 +196,8 @@ def store_query():
 
     try:
         # Check if an entry with the same question exists
-        existing_entry = supabase.table("store-queries").select("*").eq("question", question).execute()
+        existing_entry = supabase.table(
+            "store-queries").select("*").eq("question", question).execute()
 
         if existing_entry.data:
             # Update the existing entry
@@ -227,7 +226,8 @@ def store_query():
                 "seen": False,
             }
 
-            result = supabase.table("store-queries").insert(new_entry).execute()
+            result = supabase.table(
+                "store-queries").insert(new_entry).execute()
 
             if result.data:
                 return jsonify({'message': 'New query stored successfully'}), 201
@@ -238,7 +238,8 @@ def store_query():
         print(f"Error interacting with Supabase: {e}")
         return jsonify({'error': 'Could not store/update query', 'details': str(e)}), 500
 
-@app.route('/chat')
+
+@app.route('/chat',  methods=["POST"])
 def chat_http(data):
     if 'message' not in data:
         emit('billy', {'response': 'I am sorry, I do not have an answer for that question.',
@@ -247,7 +248,6 @@ def chat_http(data):
 
     message = data['message']
 
-    
     while True:
         try:
             # Call the question_chooser function to get the bucket and question
@@ -258,7 +258,7 @@ def chat_http(data):
 
             if bucket == 'NoBucket':
                 emit('billy', {
-                        'response': "I am sorry, I do not have an answer for that question.", 'type': 'answer', 'status': 'done'})
+                    'response': "I am sorry, I do not have an answer for that question.", 'type': 'answer', 'status': 'done'})
                 return
 
             raw_query = None
@@ -277,7 +277,7 @@ def chat_http(data):
             query = extract_sql_query(raw_query)
 
             emit('billy', {'response': query,
-                    'type': 'query', 'status': 'generating'})
+                           'type': 'query', 'status': 'generating'})
 
             # Execute the SQL query
             result = execute_query(query)
@@ -288,8 +288,6 @@ def chat_http(data):
         except Exception as e:
             print(f'Error: {e}. Retrying...')
 
-   
-
     answer = get_answer('openai', question, query, result)
 
     answerGenerating = True
@@ -299,19 +297,15 @@ def chat_http(data):
         try:
             next_answer = next(answer)
             answer_string += next_answer
-           
+
         except Exception as e:
             answerGenerating = False
-            
+
     return answer_string
-
-
-
 
 
 if __name__ == '__main__':
 
     app.run(debug=True)
-
 
     socketio.run(app)
