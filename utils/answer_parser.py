@@ -34,6 +34,9 @@ This is the result of the sql query:
 
 Please answer the question: {user_question}
 
+<special_instructions> 
+If you are given urls as part of the answer, make sure to include the proper markdown in your response to display for the user. All urls should be properly hyperlinked. Bold and underline all the sportsbook links, put the sportsbook name and hyperlink that.
+</special_instructions>
 
 Format the response to look good on a chat interface. Make sure to be concise and clear. Do not include any special characters.
 
@@ -54,14 +57,14 @@ def get_answer(model, question, query, sql_response):
 
     elif model == 'anthropic':
         llm = ChatAnthropic(model_name='claude-3-opus-20240229',
-                           )
+                            )
 
     llm_chain = billy_prompt | llm
 
     answer = ''
 
     for s in llm_chain.stream(
-        {'user_question': question, "sql_query": query, "result": sql_response}):
+            {'user_question': question, "sql_query": query, "result": sql_response}):
         yield s.content
         answer += str(s.content)
 

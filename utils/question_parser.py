@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-
 # Define the prompt template
 prompt_template = """
 <prompt>
@@ -22,6 +21,7 @@ TeamGameLog - This bucket is for questions that can be answered by looking at Te
 PlayerGameLog - This bucket is for questions that can be answered by looking at individual Player Game Logs in the NFL. This includes information about player stats at a game level granularity. This is good for season based questions for players. You can also use this to compare player stats in the same game or over a stretch of games. You can also use this to see how a player performs against a certain team or player. This include against the spread stat for the games so this can be used to also see how player teams perform by score and spread. You can use this bucket to see if a player is a rookie or not. You can also use this for information about player injuries.
 PlayByPlay - This bucket is for questions that can be answered by looking at play by play data for the NFL. This is good for questions that require a more granular look at the game, such as what the score was at a certain point in the game or what the result of a specific play was. You can also use this to see how players perform in certain situations or against certain teams or players in a single game, some time period, or in some situation. Use this for player red zone stats.
 TeamAndPlayerLog - This bucket is for questions that can be answered by looking at both Team and Player Game Logs in the NFL. This is good for questions that require both team and player stats, such as what the record of a team is when a certain player is/is not playing. 
+Props - This bucket is for questions that can be answered by looking at betting props for teams or players. This is good if the user inquires about betting information for a specific player or team this upcoming season. 
 ExpertAnalysis - This bucket is for questions that require expert analysis or opinion. This is good for questions that require a more subjective answer, such as who the best player in the NFL is or what the best team in the NFL is. This is also good for questions that require a more in-depth analysis, such as what the best strategy is for a team to win the Super Bowl. This can also provide real time analysis of games or players, or odds for future/current games.
 Conversation - This bucket is if the user is just trying to have a conversation with Billy. 
 NoBucket - This bucket is for questions that are not about the NFL or cannot be answered by looking at stats. If the question is too vague or unclear, it will also be placed in this bucket.
@@ -45,7 +45,7 @@ Question: How many games did the 49ers win in 2005 regular season?
 
 This is the user inputted question: {user_question}
 
-If you need the most recently played season, it is the 2023 season.  If no season is specified, assume the most recent season and the Season Type to be the regular season unless said otherwise.
+If you need the most recently played season, it is the 2023 season. For betting props, the only available information is in 2024. If no season is specified, assume the most recent season and the Season Type to be the regular season unless said otherwise. For all props, the data is for 2024.
 
 
 Remember, the tables have a lot of information, so if you think there is a chance the question could be answered by looking at the data, choose the appropriate bucket. If the question is not about the NFL choose NoBucket. If the question is not clear, make it more specific and easier to understand.
@@ -64,6 +64,8 @@ If you choose Conversation, instead of a question in the question field, put the
 billy_prompt = PromptTemplate.from_template(prompt_template)
 
 # Function to ask Billy
+
+
 def question_chooser(model, question):
     print('Question: ' + question)
     start = time.time()
@@ -81,7 +83,6 @@ def question_chooser(model, question):
     llm_response = llm_chain.invoke({'user_question': question})
 
     print(llm_response.content)
-
 
     print(str(time.time() - start) + ' seconds')
 
@@ -104,5 +105,3 @@ def extract_bucket_and_question(input_string):
             question = line.split("Question:")[1].strip()
 
     return bucket, question
-
-
