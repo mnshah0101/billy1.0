@@ -101,6 +101,7 @@ If the question cannot be answered with the data provided, please return the str
 
 This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
 
+There could be two players with the same name, so make sure to use the Team column to differentiate between them.
 
 
 

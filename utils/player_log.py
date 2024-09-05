@@ -1,5 +1,3 @@
-
-
 import os
 import sqlite3
 import pandas as pd
@@ -35,7 +33,7 @@ The name of the table is playerlog.
 Instead of HomeTeam and AwayTeam, reference the Team column and the HomeOrAway Column, The Opponent column will have the opposite side.
 You will have to infer player names from little data from your understanding of the NFL. For example, if the user only says Kelce, you have to infer the name Travis Kelce
 To find games where two players have played against each other, you can join the table on the GameKey where the Name matches the player.
-To calculate "Against the Spread" (ATS), you need to determine whether a team has covered the point spread in a game. The formula for ATS can be derived using the team score, opponent score, and point spread as follows:
+To calculate "Against the Spread" (ATS), you need to determine whether a team has covered the point spread in a game. If the team is a favorite, they have a negative point spread, and if the team is an underdog, they have a positive point spread. The formula for ATS can be derived using the team score, opponent score, and point spread as follows:
 
 Formula:
 Calculate the Cover Margin:
@@ -72,7 +70,11 @@ All columns must be surrounded by double quotes, such as "Name" or "Team".
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
 
+Never include the preseason in any of your responses, and make sure to include all the types of seasons that are provided in the response (regular season, postseason, or regular season and postseason). Also, try and name all the games relevant to the question. This is important.
 
+If asked for ranking, make sure you rank everyone in that position by the criteria given and then output the rank of the player for that criteria. This is important.
+
+You can never not include the player name in the SQL query - doing so would be catastrophic.
 
 </special_instructions>
 
@@ -96,7 +98,7 @@ WHERE "Season" = 2023 AND "Name" = 'Patrick Mahomes'
 
 
 Your response will be executed on a database of NFL Player Logs and the answer will be returned to the User, so make sure the query is correct and will return the correct information.
-Do not use the like operator, as this may lead to false positives.
+You may have to use the "like" operator to match player names, as the user may not provide the full name of the player or the database may have a different format for the player name.
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
 
@@ -298,19 +300,17 @@ Experience (double precision) - The number of years the player has played in the
 def player_log_get_answer(model, question):
     llm = None
     if model == 'openai':
-        try: 
+        try:
             llm = ChatOpenAI(model='gpt-4o', temperature=0.96)
         except Exception as e:
             print("key not given", e)
 
     elif model == 'anthropic':
         llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620')
-    
+
     print(llm)
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
         {'user_question': question, "table_metadata_string": testnfl_metadata})
 
     return answer.content
-
-
