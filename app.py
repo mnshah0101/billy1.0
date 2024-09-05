@@ -11,6 +11,7 @@ from flask_socketio import send, emit
 from utils.player_and_team import player_and_team_log_get_answer
 from utils.props import props_log_get_answer
 from utils.perplexity import ask_expert
+from utils.futures import futures_log_get_answer
 from flask import request
 from supabase import create_client, Client
 import dotenv
@@ -113,6 +114,10 @@ def chat(data):
                     'anthropic', question)
             elif bucket == 'Props':
                 raw_query = props_log_get_answer(
+                    'anthropic', question
+                )
+            elif bucket == 'Futures':
+                raw_query = futures_log_get_answer(
                     'anthropic', question
                 )
 
@@ -306,6 +311,6 @@ def chat_http(data):
 
 if __name__ == '__main__':
 
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
 
-    socketio.run(app)
+    socketio.run(app, port=5000)
