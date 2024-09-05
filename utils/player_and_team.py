@@ -69,6 +69,7 @@ All columns must be surrounded by double quotes, such as "Name" or "Team".
 
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
+Do not use the like operator, as this may lead to false positives.
 
 
 
