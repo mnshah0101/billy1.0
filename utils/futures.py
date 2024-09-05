@@ -180,6 +180,7 @@ If the question cannot be answered with the data provided, please return the str
 
 
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
+Make sure you surround columns with double quotes since it is case sensitive. An example is p."PlayerName". 
 
 
 Assistant: 
