@@ -20,7 +20,6 @@ PlayerID (double precision) - Unique identifier for a player
 BettingOutcomeID (double precision) - Unique identifier for a specific betting outcome
 BettingEventID (bigint) - Unique identifier for a betting event
 PayoutAmerican (double precision) - Payout in American odds format
-PayoutDecimal (double precision) - Payout in decimal odds format
 Value (double precision) - The betting line or total for props
 TeamID (double precision) - Unique identifier for a team
 GlobalTeamID (double precision) - Unique identifier for a team across all leagues/sports

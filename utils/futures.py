@@ -13,7 +13,6 @@ PlayerID (double precision) - If this is a player future, this is the unique ide
 BettingOutcomeID (bigint)
 BettingMarketID (bigint)
 PayoutAmerican (bigint) - This is the payout in American odds format
-PayoutDecimal (double precision) - This is the payout in decimal odds format
 GlobalTeamID (double precision) - This is the unique identifier for a team if it is a team future
 BettingEventID (bigint) 
 BettingOutcomeType (text) - Can be [nan, 'No', 'Yes', 'Under', 'Over']
