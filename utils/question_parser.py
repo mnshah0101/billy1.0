@@ -3,8 +3,10 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import OpenAI, ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
+
 
 
 # Define the prompt template
@@ -54,7 +56,7 @@ Remember, the tables have a lot of information, so if you think there is a chanc
 If you choose NoBucket, instead of a question in the question field, put the reason why it is NoBucket. Remember this is going to be shown to the user, so make sure it is clear and concise. If it is too vague, ask for clarification. Use your knowledge of the NFL to to see if a question is too vague.
 
 If you choose Conversation, instead of a question in the question field, put the natural conversation you would have with the user. 
-
+If you need the current date, it is {current_date}. If the questions mentions today, or tonight or anything of the sort, include this date in the response.
 
 
 
@@ -68,6 +70,7 @@ billy_prompt = PromptTemplate.from_template(prompt_template)
 
 
 def question_chooser(model, question):
+    current_date = str(datetime.datetime.today()).split()[0]
     print('Question: ' + question)
     start = time.time()
 
@@ -81,7 +84,7 @@ def question_chooser(model, question):
 
     llm_chain = billy_prompt | llm
 
-    llm_response = llm_chain.invoke({'user_question': question})
+    llm_response = llm_chain.invoke({'user_question': question, 'current_date': current_date})
 
     print(llm_response.content)
 

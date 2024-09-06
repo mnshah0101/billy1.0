@@ -88,16 +88,16 @@ BettingPeriodType (text) - Could be ['Full Game', '1st Quarter', '3rd Quarter', 
 PlayerName (text) - If it is a player prop this will be the name of the player for player props, format is first name last name, ex: 'Jordan Love'
 Created (text) - Timestamp of when the record was created
 Updated (text) - Timestamp of when the record was last updated
-Date (text) - Date of the game
+Date (text) - Date of the game, looks like  looks like 2024-09-07T00:15:00
 AwayTeam (text) - Name of the away team in short form, like the San Francisco 49ers are SF
 HomeTeam (text) - Name of the home team in short form, like the San Francisco 49ers are SF
 Channel (text) - Name of network provider, could be ['PEA', 'NBC', 'FOX', 'CBS', 'ABC', 'ESPN', 'AMZN', 'NFLN', 'NFLX', nan]
 QuarterDescription (text) - Description of the current quarter or game state
-LastUpdated (text) - Timestamp of the last update to the game information
-Day (text) - Day of the week for the game
-DateTime (text) - Date and time of the game
+LastUpdated (text) - Timestamp of the last update to the game information, looks like 2024-09-06T20:15:00
+Day (text) - Day of the week for the game, looks like 2024-09-06T00:00:00
+DateTime (text) - Date and time of the game, looks like 2024-09-06T20:15:00
 Status (text) - Current status of the game (e.g., scheduled, in progress, final)
-DateTimeUTC (text) - Date and time of the game in UTC
+DateTimeUTC (text) - Date and time of the game in UTC, looks like 2024-09-07T00:15:00
 BettingOutcomeType (text) - Could be ['Over', 'Under', 'Away', 'Home', nan, 'Yes', 'Draw', 'No', 'Odd',
        'Even', 'Neither']
 SportsbookUrl (text) - URL to the sportsbook's page for this game or bet

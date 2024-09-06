@@ -111,8 +111,8 @@ BettingPeriodType (text) -Can be['NFL Championship Game', 'Regular Season - Incl
        'Regular Season']
 TeamKey (text) -  If it a team future, this will have the short form of the team, for example the 49ers are SF
 PlayerName (text) - If it is a player future, this will be the name of the player
-Created (text) - Timestamp of when the record was created
-Updated (text) - Timestamp of when the record was last updated
+Created (text) - Timestamp of when the record was created, looks like  looks like 2024-09-07T00:15:00
+Updated (text) - Timestamp of when the record was last updated, looks like  looks like 2024-09-07T00:15:00
 
 """
 
