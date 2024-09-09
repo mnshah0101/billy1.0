@@ -87,18 +87,14 @@ BettingBetType (text) - Could be ['Total Points', 'Spread', 'Moneyline', 'Total 
 'To Complete First Pass']
 BettingPeriodType (text) - Could be ['Full Game', '1st Quarter', '3rd Quarter', '4th Quarter','2nd Quarter', 'First Half', 'Second Half', 'Regular Season']
 PlayerName (text) - If it is a player prop this will be the name of the player for player props, format is first name last name, ex: 'Jordan Love'
-Created (text) - Timestamp of when the record was created, looks like 2024-09-07T00:15:00
-Updated (text) - Timestamp of when the record was last updated, looks like 2024-09-07T00:15:00
-Date (text) - Date of the game, looks like  looks like 2024-09-07T00:15:00
 AwayTeam (text) - Name of the away team in short form, like the San Francisco 49ers are SF
 HomeTeam (text) - Name of the home team in short form, like the San Francisco 49ers are SF
 Channel (text) - Name of network provider, could be ['PEA', 'NBC', 'FOX', 'CBS', 'ABC', 'ESPN', 'AMZN', 'NFLN', 'NFLX', nan]
 QuarterDescription (text) - Description of the current quarter or game state
-LastUpdated (text) - Timestamp of the last update to the game information, looks like 2024-09-06T20:15:00
-Day (text) - Day of the week for the game, looks like 2024-09-06T00:00:00
-DateTime (text) - Date and time of the game, looks like 2024-09-06T20:15:00
+Day (text) - Day of the week for the game, looks like 2024-09-06T00:00:00. You can use this when you don't know game time. 
+DateTime (text) - Datetime of the game, looks like 2024-09-06T20:15:00. You can use this when you know the exact starting game time.
 Status (text) - Current status of the game (e.g., scheduled, in progress, final)
-DateTimeUTC (text) - Date and time of the game in UTC, looks like 2024-09-07T00:15:00
+DateTimeUTC (text) - Datetime of the game in UTC, looks like 2024-09-07T00:15:00. You can use this when you know the exact starting game time.
 BettingOutcomeType (text) - Could be ['Over', 'Under', 'Away', 'Home', nan, 'Yes', 'Draw', 'No', 'Odd',
        'Even', 'Neither']
 SportsbookUrl (text) - URL to the sportsbook's page for this game or bet
@@ -168,6 +164,7 @@ If the question cannot be answered with the data provided, please return the str
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 Make sure you surround columns with double quotes since it is case sensitive. An example is p."PlayerName". 
 This is the current date: {current_date}
+For game days, you can use the Day column, if you don't have the time of the game.
 
 Assistant: 
 
@@ -189,7 +186,8 @@ def props_log_get_answer(model, question):
 
     print(llm)
     llm_chain = sql_prompt | llm
+    print(sql_prompt)
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d')})
+        {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d-%H-%M-%S')})
 
     return answer.content
