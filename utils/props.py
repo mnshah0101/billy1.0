@@ -7,6 +7,7 @@ from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
 import re
+from datetime import datetime
 
 props_metadata = props_metadata = """
 GlobalHomeTeamID (bigint) 
@@ -86,8 +87,8 @@ BettingBetType (text) - Could be ['Total Points', 'Spread', 'Moneyline', 'Total 
 'To Complete First Pass']
 BettingPeriodType (text) - Could be ['Full Game', '1st Quarter', '3rd Quarter', '4th Quarter','2nd Quarter', 'First Half', 'Second Half', 'Regular Season']
 PlayerName (text) - If it is a player prop this will be the name of the player for player props, format is first name last name, ex: 'Jordan Love'
-Created (text) - Timestamp of when the record was created
-Updated (text) - Timestamp of when the record was last updated
+Created (text) - Timestamp of when the record was created, looks like 2024-09-07T00:15:00
+Updated (text) - Timestamp of when the record was last updated, looks like 2024-09-07T00:15:00
 Date (text) - Date of the game, looks like  looks like 2024-09-07T00:15:00
 AwayTeam (text) - Name of the away team in short form, like the San Francisco 49ers are SF
 HomeTeam (text) - Name of the home team in short form, like the San Francisco 49ers are SF
@@ -166,6 +167,7 @@ If the question cannot be answered with the data provided, please return the str
 
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 Make sure you surround columns with double quotes since it is case sensitive. An example is p."PlayerName". 
+This is the current date: {current_date}
 
 Assistant: 
 
@@ -188,6 +190,6 @@ def props_log_get_answer(model, question):
     print(llm)
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": props_metadata})
+        {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d')})
 
     return answer.content
