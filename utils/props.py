@@ -98,8 +98,8 @@ DateTimeUTC (text) - Datetime of the game in UTC, looks like 2024-09-07T00:15:00
 BettingOutcomeType (text) - Could be ['Over', 'Under', 'Away', 'Home', nan, 'Yes', 'Draw', 'No', 'Odd',
        'Even', 'Neither']
 SportsbookUrl (text) - URL to the sportsbook's page for this game or bet
-BetPercentage (double precision) - Percentage of bets on this outcome
-MoneyPercentage (double precision) - Percentage of money on this outcome
+BetPercentage (double precision) - Percentage of bets on this outcome, a lot of these are NaN, but some are not
+MoneyPercentage (double precision) - Percentage of money on this outcome, a lot of these are NaN, but some are not
 
 """
 
