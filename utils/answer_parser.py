@@ -65,6 +65,7 @@ def get_answer(model, question, query, sql_response):
 
     for s in llm_chain.stream(
             {'user_question': question, "sql_query": query, "result": sql_response}):
+        print(s.content)
         yield s.content
         answer += str(s.content)
 

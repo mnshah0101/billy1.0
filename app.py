@@ -158,8 +158,12 @@ def chat(data):
 
         except Exception as e:
             print(f'Error: {e}. Retrying...')
+    print("Result:")
+    print(result)
 
     answer = get_answer('openai', question, query, result)
+
+    print("Answer:")
 
     answerGenerating = True
     answer_string = ''
@@ -172,6 +176,25 @@ def chat(data):
                  'type': 'answer', 'status': 'generating', 'bucket': bucket})
         except Exception as e:
             answerGenerating = False
+            print(f'Answer: {answer_string}')
+            if answer_string == "":
+                #go to expert
+                emit('billy', {'response': '',
+                        'type': 'query', 'status': 'generating'})
+                generator = ask_expert(question)
+                answer = ''
+                generating_answer = True
+                while generating_answer:
+                    try:
+                        next_answer = next(generator)
+                        answer += next_answer
+                        emit('billy', {'response': next_answer,
+                             'type': 'answer', 'status': 'generating'})
+                    except Exception as e:
+                        generating_answer = False
+                        emit('billy', {'response': next_answer,
+                             'type': 'answer', 'status': 'done'})
+                        
 
             emit('billy', {'response': answer_string,
                  'type': 'answer', 'status': 'done'})
