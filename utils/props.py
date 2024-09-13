@@ -93,7 +93,6 @@ Channel (text) - Name of network provider, could be ['PEA', 'NBC', 'FOX', 'CBS',
 QuarterDescription (text) - Description of the current quarter or game state
 Day (text) - Day of the week for the game, looks like 2024-09-06T00:00:00. You can use this when you don't know game time. 
 DateTime (text) - Datetime of the game, looks like 2024-09-06T20:15:00. You can use this when you know the exact starting game time.
-Status (text) - Current status of the game (e.g., scheduled, in progress, final)
 DateTimeUTC (text) - Datetime of the game in UTC, looks like 2024-09-07T00:15:00. You can use this when you know the exact starting game time.
 BettingOutcomeType (text) - Could be ['Over', 'Under', 'Away', 'Home', nan, 'Yes', 'Draw', 'No', 'Odd',
        'Even', 'Neither']

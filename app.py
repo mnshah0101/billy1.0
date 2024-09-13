@@ -61,7 +61,7 @@ def chat(data):
     while True:
         try:
             # Call the question_chooser function to get the bucket and question
-            bucket, question = question_chooser('anthropic', message)
+            bucket, question = question_chooser('openai', message)
             global_bucket = bucket
 
             print(f'Bucket: {bucket}')
@@ -104,21 +104,21 @@ def chat(data):
             raw_query = None
 
             if bucket == 'TeamGameLog':
-                raw_query = team_log_get_answer('anthropic', question)
+                raw_query = team_log_get_answer('openai', question)
             elif bucket == 'PlayerGameLog':
-                raw_query = player_log_get_answer('anthropic', question)
+                raw_query = player_log_get_answer('openai', question)
             elif bucket == 'PlayByPlay':
-                raw_query = play_by_play_get_answer('anthropic', question)
+                raw_query = play_by_play_get_answer('openai', question)
             elif bucket == 'TeamAndPlayerLog':
                 raw_query = player_and_team_log_get_answer(
-                    'anthropic', question)
+                    'openai', question)
             elif bucket == 'Props':
                 raw_query = props_log_get_answer(
-                    'anthropic', question
+                    'openai', question
                 )
             elif bucket == 'Futures':
                 raw_query = futures_log_get_answer(
-                    'anthropic', question
+                    'openai', question
                 )
 
             print(bucket)
@@ -292,14 +292,14 @@ def chat_http(data):
             raw_query = None
 
             if bucket == 'TeamGameLog':
-                raw_query = team_log_get_answer('anthropic', question)
+                raw_query = team_log_get_answer('openai', question)
             elif bucket == 'PlayerGameLog':
-                raw_query = player_log_get_answer('anthropic', question)
+                raw_query = player_log_get_answer('openai', question)
             elif bucket == 'PlayByPlay':
-                raw_query = play_by_play_get_answer('anthropic', question)
+                raw_query = play_by_play_get_answer('openai', question)
             elif bucket == 'TeamAndPlayerLog':
                 raw_query = player_and_team_log_get_answer(
-                    'anthropic', question)
+                    'openai', question)
 
             # Extract the SQL query from the raw_query
             query = extract_sql_query(raw_query)
