@@ -9,6 +9,8 @@ from utils.answer_parser import get_answer
 from flask_socketio import SocketIO
 from flask_socketio import send, emit
 from utils.player_and_team import player_and_team_log_get_answer
+from utils.playerlogandprops import player_log_and_props_get_answer
+from utils.teamlogandprops import team_log_and_props_get_answer
 from utils.props import props_log_get_answer
 from utils.perplexity import ask_expert
 from utils.futures import futures_log_get_answer
@@ -61,7 +63,7 @@ def chat(data):
     while True:
         try:
             # Call the question_chooser function to get the bucket and question
-            bucket, question = question_chooser('openai', message)
+            bucket, question = question_chooser('anthropic', message)
             global_bucket = bucket
 
             print(f'Bucket: {bucket}')
@@ -88,6 +90,7 @@ def chat(data):
                 generator = ask_expert(question)
                 answer = ''
                 generating_answer = True
+                next_answer = ''
                 while generating_answer:
                     try:
                         next_answer = next(generator)
@@ -95,6 +98,7 @@ def chat(data):
                         emit('billy', {'response': next_answer,
                              'type': 'answer', 'status': 'generating'})
                     except Exception as e:
+                        print(f'Error: {e}')
                         generating_answer = False
                         emit('billy', {'response': next_answer,
                              'type': 'answer', 'status': 'done'})
@@ -104,21 +108,29 @@ def chat(data):
             raw_query = None
 
             if bucket == 'TeamGameLog':
-                raw_query = team_log_get_answer('openai', question)
+                raw_query = team_log_get_answer('anthropic', question)
             elif bucket == 'PlayerGameLog':
-                raw_query = player_log_get_answer('openai', question)
+                raw_query = player_log_get_answer('anthropic', question)
             elif bucket == 'PlayByPlay':
-                raw_query = play_by_play_get_answer('openai', question)
+                raw_query = play_by_play_get_answer('anthropic', question)
             elif bucket == 'TeamAndPlayerLog':
                 raw_query = player_and_team_log_get_answer(
-                    'openai', question)
+                    'anthropic', question)
             elif bucket == 'Props':
                 raw_query = props_log_get_answer(
-                    'openai', question
+                    'anthropic', question
+                )
+            elif bucket == 'PlayerLogAndProps':
+                raw_query = player_log_and_props_get_answer(
+                    'anthropic', question
+                )
+            elif bucket == 'TeamLogAndProps':
+                raw_query = team_log_and_props_get_answer(
+                    'anthropic', question
                 )
             elif bucket == 'Futures':
                 raw_query = futures_log_get_answer(
-                    'openai', question
+                    'anthropic', question
                 )
 
             print(bucket)
@@ -279,7 +291,7 @@ def chat_http(data):
     while True:
         try:
             # Call the question_chooser function to get the bucket and question
-            bucket, question = question_chooser('openai', message)
+            bucket, question = question_chooser('anthropic', message)
 
             print(f'Bucket: {bucket}')
             print(f'Question: {question}')
@@ -292,14 +304,14 @@ def chat_http(data):
             raw_query = None
 
             if bucket == 'TeamGameLog':
-                raw_query = team_log_get_answer('openai', question)
+                raw_query = team_log_get_answer('anthropic', question)
             elif bucket == 'PlayerGameLog':
-                raw_query = player_log_get_answer('openai', question)
+                raw_query = player_log_get_answer('anthropic', question)
             elif bucket == 'PlayByPlay':
-                raw_query = play_by_play_get_answer('openai', question)
+                raw_query = play_by_play_get_answer('anthropic', question)
             elif bucket == 'TeamAndPlayerLog':
                 raw_query = player_and_team_log_get_answer(
-                    'openai', question)
+                    'anthropic', question)
 
             # Extract the SQL query from the raw_query
             query = extract_sql_query(raw_query)
@@ -316,7 +328,7 @@ def chat_http(data):
         except Exception as e:
             print(f'Error: {e}. Retrying...')
 
-    answer = get_answer('openai', question, query, result)
+    answer = get_answer('anthropic', question, query, result)
 
     answerGenerating = True
     answer_string = ''

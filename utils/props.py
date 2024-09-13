@@ -9,7 +9,7 @@ from langchain_anthropic import ChatAnthropic
 import re
 from datetime import datetime
 
-props_metadata = props_metadata = """
+props_metadata = """
 GlobalHomeTeamID (bigint) 
 PointSpreadAwayTeamMoneyLine (bigint)
 PointSpreadHomeTeamMoneyLine (bigint) 
@@ -123,6 +123,9 @@ The name of the table is props.
 
 There will only be a player name if the question is about a player, and a team name will only be non-null if the question is about the team. All props data is for 2024 only.
 You must list all the sportsbooks (Draftkings, FanDuel, etc) and corresponding sportsbook urls for all the stats you are providing. 
+
+When asking for multiple props, only provide at most 3 interesting props. When being asked to decide which props are the most popular, use your intuition to decide which ones most seem popular. 
+
 </special_instructions>
 
 

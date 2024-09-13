@@ -25,7 +25,7 @@ def ask_expert(question):
 
     # chat completion with streaming
     response_stream = client.chat.completions.create(
-        model="llama-3-sonar-large-32k-online",
+        model="llama-3.1-sonar-huge-128k-online",
         messages=messages,
         stream=True,
     )
