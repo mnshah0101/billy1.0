@@ -9,6 +9,11 @@ from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
 import re
+import dotenv
+
+dotenv.load_dotenv()
+
+
 
 # Define the prompt template
 prompt_template = """
@@ -107,4 +112,4 @@ def get_answer(model, question, query, sql_response):
         yield s.content
         answer += str(s.content)
 
-    return answer
+    return 

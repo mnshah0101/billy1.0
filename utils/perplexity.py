@@ -1,6 +1,9 @@
 from openai import OpenAI
+import dotenv
+import os
 
-YOUR_API_KEY = "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"
+dotenv.load_dotenv()
+
 
 
 def ask_expert(question):
@@ -8,7 +11,7 @@ def ask_expert(question):
         {
             "role": "system",
             "content": (
-                "You are an expert sports analyst. I am a curious user who wants to know more about the NFL and betting. Your queries are strictly about the NFL."
+                "You are an expert sports analyst. I am a curious user who wants to know more about the NFL and betting. Your queries are strictly about the NFL. The current season is the 2024 season."
             ),
         },
         {
@@ -19,7 +22,8 @@ def ask_expert(question):
         },
     ]
 
-    client = OpenAI(api_key=YOUR_API_KEY, base_url="https://api.perplexity.ai")
+    client = OpenAI(api_key=os.getenv('PERPLEXITY_KEY'),
+                    base_url="https://api.perplexity.ai")
 
 
 

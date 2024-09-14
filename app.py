@@ -15,8 +15,11 @@ from utils.props import props_log_get_answer
 from utils.perplexity import ask_expert
 from utils.futures import futures_log_get_answer
 from flask import request
+import tiktoken
 from supabase import create_client, Client
 import dotenv
+from functools import wraps
+
 import os
 import logging
 
@@ -39,179 +42,137 @@ socketio = SocketIO(app, cors_allowed_origins='*')
 global_bucket = None
 
 
+def count_tokens(string: str) -> int:
+    encoding = tiktoken.get_encoding("o200k_base")
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+def handle_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print('Error from handle_errors')
+            print(f"Error: {e}")
+            emit('billy', {
+                'response': "I'm sorry, an error occurred while processing your request.",
+                'type': 'answer',
+                'status': 'done'
+            })
+    return wrapper
+
+
+def get_ip_and_session(data):
+    ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    session = data['message'].get('session', 'Unknown')
+    return ip, session
+
+
+def process_expert_analysis(question):
+    emit('billy', {'response': '', 'type': 'query', 'status': 'generating'})
+    generator = ask_expert(question)
+    answer = ''
+    for next_answer in generator:
+        answer += next_answer
+        emit('billy', {'response': next_answer,
+             'type': 'answer', 'status': 'generating'})
+    emit('billy', {'response': next_answer,
+         'type': 'answer', 'status': 'done'})
+    return ''
+
+
+def process_database_query(bucket, question):
+    bucket_to_function = {
+        'TeamGameLog': team_log_get_answer,
+        'PlayerGameLog': player_log_get_answer,
+        'PlayByPlay': play_by_play_get_answer,
+        'TeamAndPlayerLog': player_and_team_log_get_answer,
+        'Props': props_log_get_answer,
+        'PlayerLogAndProps': player_log_and_props_get_answer,
+        'TeamLogAndProps': team_log_and_props_get_answer,
+        'Futures': futures_log_get_answer
+    }
+
+    get_answer_func = bucket_to_function.get(bucket)
+    if not get_answer_func:
+        raise ValueError(f"Unknown bucket: {bucket}")
+
+    raw_query = get_answer_func('anthropic', question)
+    if 'error' in raw_query.lower() or 'cannot' in raw_query.lower():
+        return process_expert_analysis(question)
+
+    query = extract_sql_query(raw_query)
+    emit('billy', {'response': query, 'type': 'query', 'status': 'generating'})
+    result = execute_query(query)
+    print(f"Result: {result}")
+
+    tokens = count_tokens(str(result))
+    if tokens > 5000:
+        return process_expert_analysis(question)
+
+
+    return get_answer('openai', question, query, result)
+
+
 @socketio.on('billy')
+@handle_errors
 def chat(data):
     if 'message' not in data:
         emit('billy', {'response': 'I am sorry, I do not have an answer for that question.',
-             'type': 'query', 'status': 'done'})
+                       'type': 'query', 'status': 'done'})
         print('No message or ip or session')
         return
-    print("Message:")
-    print(data['message'])
-
-    ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
     message = data['message']['message']
+    ip, session = get_ip_and_session(data)
+    print(f"Message: {message}")
+    print(f"IP: {ip}")
+    print(f"Session: {session}")
 
-    session = data['message']['session']
-
-    print(f'IP: {ip}')
-    print(f'Session: {session}')
+    bucket, question = question_chooser('anthropic', message)
+    print(f"Bucket: {bucket}")
+    print(f"Question: {question}")
 
     global global_bucket
+    global_bucket = bucket
 
-    while True:
-        try:
-            # Call the question_chooser function to get the bucket and question
-            bucket, question = question_chooser('anthropic', message)
-            global_bucket = bucket
+    if bucket == 'Conversation':
+        emit('billy', {'response': question,
+             'type': 'answer', 'status': 'done'})
+        return
 
-            print(f'Bucket: {bucket}')
-            print(f'Question: {question}')
+    if bucket == 'NoBucket':
+        response = question if question else "I am sorry, I do not have an answer for that question."
+        emit('billy', {'response': response,
+             'type': 'answer', 'status': 'done'})
+        return
 
-            if bucket == 'Conversation':
-                emit('billy', {'response': question,
-                     'type': 'answer', 'status': 'done'})
-                return
+    if bucket == 'ExpertAnalysis':
+        return process_expert_analysis(question)
+    
+    try:
 
-            if bucket == 'NoBucket':
-                if question == '':
-                    emit('billy', {
-                        'response': "I am sorry, I do not have an answer for that question.", 'type': 'answer', 'status': 'done'})
-                    return
-
-                emit('billy', {
-                    'response': question, 'type': 'answer', 'status': 'done'})
-                return
-
-            if bucket == 'ExpertAnalysis':
-                emit('billy', {'response': '',
-                               'type': 'query', 'status': 'generating'})
-                generator = ask_expert(question)
-                answer = ''
-                generating_answer = True
-                next_answer = ''
-                while generating_answer:
-                    try:
-                        next_answer = next(generator)
-                        answer += next_answer
-                        emit('billy', {'response': next_answer,
-                             'type': 'answer', 'status': 'generating'})
-                    except Exception as e:
-                        print(f'Error: {e}')
-                        generating_answer = False
-                        emit('billy', {'response': next_answer,
-                             'type': 'answer', 'status': 'done'})
-
-                return answer
-
-            raw_query = None
-
-            if bucket == 'TeamGameLog':
-                raw_query = team_log_get_answer('anthropic', question)
-            elif bucket == 'PlayerGameLog':
-                raw_query = player_log_get_answer('anthropic', question)
-            elif bucket == 'PlayByPlay':
-                raw_query = play_by_play_get_answer('anthropic', question)
-            elif bucket == 'TeamAndPlayerLog':
-                raw_query = player_and_team_log_get_answer(
-                    'anthropic', question)
-            elif bucket == 'Props':
-                raw_query = props_log_get_answer(
-                    'anthropic', question
-                )
-            elif bucket == 'PlayerLogAndProps':
-                raw_query = player_log_and_props_get_answer(
-                    'anthropic', question
-                )
-            elif bucket == 'TeamLogAndProps':
-                raw_query = team_log_and_props_get_answer(
-                    'anthropic', question
-                )
-            elif bucket == 'Futures':
-                raw_query = futures_log_get_answer(
-                    'anthropic', question
-                )
-
-            print(bucket)
-
-            print(f'Raw Query: {raw_query}')
-
-            if 'error' and 'cannot' in raw_query.lower():
-                emit('billy', {'response': '',
-                               'type': 'query', 'status': 'generating'})
-                generator = ask_expert(question)
-                answer = ''
-                generating_answer = True
-                while generating_answer:
-                    try:
-                        next_answer = next(generator)
-                        answer += next_answer
-                        emit('billy', {'response': next_answer,
-                             'type': 'answer', 'status': 'generating'})
-                    except Exception as e:
-                        generating_answer = False
-                        emit('billy', {'response': next_answer,
-                             'type': 'answer', 'status': 'done'})
-
-                return answer
-
-            # Extract the SQL query from the raw_query
-            query = extract_sql_query(raw_query)
-
-            emit('billy', {'response': query,
-                           'type': 'query', 'status': 'generating'})
-
-            # Execute the SQL query
-            result = execute_query(query)
-
-            # If execution reaches here, the query was successful, break the loop
-            break
-
-        except Exception as e:
-            print(f'Error: {e}. Retrying...')
-    print("Result:")
-    print(result)
-
-    answer = get_answer('openai', question, query, result)
-
-    print("Answer:")
-
-    answerGenerating = True
-    answer_string = ''
-
-    while answerGenerating:
-        try:
-            next_answer = next(answer)
+        answer_generator = process_database_query(bucket, question)
+        answer_string = ''
+        for next_answer in answer_generator:
             answer_string += next_answer
-            emit('billy', {'response': answer_string,
-                 'type': 'answer', 'status': 'generating', 'bucket': bucket})
-        except Exception as e:
-            answerGenerating = False
-            print(f'Answer: {answer_string}')
-            if answer_string == "":
-                #go to expert
-                emit('billy', {'response': '',
-                        'type': 'query', 'status': 'generating'})
-                generator = ask_expert(question)
-                answer = ''
-                generating_answer = True
-                while generating_answer:
-                    try:
-                        next_answer = next(generator)
-                        answer += next_answer
-                        emit('billy', {'response': next_answer,
-                             'type': 'answer', 'status': 'generating'})
-                    except Exception as e:
-                        generating_answer = False
-                        emit('billy', {'response': next_answer,
-                             'type': 'answer', 'status': 'done'})
-                        
+            emit('billy', {'response': answer_string, 'type': 'answer',
+                'status': 'generating', 'bucket': bucket})
 
-            emit('billy', {'response': answer_string,
-                 'type': 'answer', 'status': 'done'})
+        
 
-    return answer_string
+        emit('billy', {'response': answer_string,
+            'type': 'answer', 'status': 'done'})
+        return answer_string
+    except Exception as e:
+        emit('billy', {
+            'response': "I'm sorry, an error occurred while processing your request. Please try again.",
+            'type': 'answer',
+            'status': 'done'
+        })
+        print(f"Error: {e}")
+        return 
 
 
 @app.route('/store-query', methods=['POST'])
@@ -349,3 +310,4 @@ if __name__ == '__main__':
     app.run(debug=True, port=5000)
 
     socketio.run(app, port=5000)
+
