@@ -98,7 +98,7 @@ WHERE
 </example_response>
 
 Your response will be executed on a database of NFL Team Logs and the answer will be returned to the User, so make sure the query is correct and will return the correct information.
-The default SeasonType is Regular Season or 1. If the question is about a different SeasonType, please specify in the query. The default season is 2023.
+The default SeasonType is Regular Season or 1. If the question is about a different SeasonType, please specify in the query. The default season is 2024.
 Use the Wins and Losses columns to determine the number of wins and losses for a team. They reset each season and each season type. Remember, they are cumulative up to the current game.
 
 
@@ -120,7 +120,7 @@ testnfl_metadata = """
 GameKey (BIGINT): 
 Date (TEXT): Format: 'YYYY-MM-DDTHH:MM:SS'. Remember, this is not a Date type, it is a TEXT type.
 SeasonType (BIGINT): (1=Regular Season, 2=Preseason, 3=Postseason, 4=Offseason, 5=AllStar). The default season type is 1.
-Season (BIGINT): The default season is 2023.
+Season (BIGINT): The default season is 2024.
 Week (BIGINT): The week resets for each season type. The default week is 1. Week 17 is the last week of the regular season.
 Team (TEXT):
 Opponent (TEXT): The name of the opponent team.

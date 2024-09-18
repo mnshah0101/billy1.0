@@ -55,7 +55,7 @@ Only respond with the sql query, no explanation or anything else. Encompass the 
 
 You can use MIN(GameKey) to get the earliest game and MAX(GameKey) to get the latest game.
 
-Remember, since the 2023 season has ended, rookies have experience of 2 or less.
+Remember, since the 2024 season has ended, rookies have experience of 2 or less.
 
 A player is injured if the InjuryStatus is Doubtful, Out, or Questionable.
 

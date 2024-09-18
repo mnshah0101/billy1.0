@@ -122,7 +122,7 @@ testnfl_metadata = """
 GameKey (BIGINT): 
 Date (TEXT): Format: 'YYYY-MM-DDTHH:MM:SS'. Remember, this is not a Date type, it is a TEXT type.
 SeasonType (BIGINT): (1=Regular Season, 2=Preseason, 3=Postseason, 4=Offseason, 5=AllStar). The default season type is 1.
-Season (BIGINT): The default season is 2023.
+Season (BIGINT): The default season is 2024.
 Week (BIGINT): The week resets for each season type. The default week is 1. Week 17 is the last week of the regular season.
 Team (TEXT):
 Opponent (TEXT): The name of the opponent team.
