@@ -600,7 +600,7 @@ def player_and_team_log_get_answer(model, question):
         llm = ChatOpenAI(model='gpt-4o', temperature=0.9)
 
     elif model == 'anthropic':
-        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620' temperature=0.5)
+        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=0.5)
 
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
