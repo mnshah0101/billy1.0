@@ -80,7 +80,7 @@ def question_chooser(model, question):
         llm = ChatOpenAI(model='gpt-4', temperature=0.7)
 
     elif model == 'anthropic':
-        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620',
+        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=0.5,
                             )
 
     llm_chain = billy_prompt | llm
