@@ -75,6 +75,7 @@ Never include the preseason in any of your responses, and make sure to include a
 If asked for ranking, make sure you rank everyone in that position by the criteria given and then output the rank of the player for that criteria. This is important.
 
 You can never not include the player name in the SQL query - doing so would be catastrophic.
+To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
 
 </special_instructions>
 

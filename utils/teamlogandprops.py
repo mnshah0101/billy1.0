@@ -60,6 +60,7 @@ A clever way to get the last game of a team is to do MAX(GameKey), which will gi
 All columns must be surrounded by double quotes, such as "Name" or "Team".
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
+To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
 
 
 </special_instructions_team_logs>

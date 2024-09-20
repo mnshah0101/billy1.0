@@ -66,6 +66,7 @@ Usually, even when a player is out or injured, they will have a record in the da
 Be careful of periods in the player name. For example, TJ Watt is T.J. Watt in the database.
 
 All columns must be surrounded by double quotes, such as "Name" or "Team".
+To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
 
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
