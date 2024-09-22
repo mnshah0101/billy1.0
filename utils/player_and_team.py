@@ -74,7 +74,9 @@ Do not use the like operator, as this may lead to false positives.
 
 The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
 
+Use the Team column to determine the team, and the HomeOrAway column to determine if the team is the home team or the away team. The Opponent column will have the opposite side.
 
+When querying coach, use the Team column to make sure you are getting the correct coach, and then you can use the HomeHeadCoach and AwayHeadCoach with HomeOrAway to determine the correct coach.
 
 </special_instructions>
 
@@ -105,6 +107,7 @@ This is a postgres database. Do not create any new columns or tables. Only refer
 
 There could be two players with the same name, so make sure to use the Team column to differentiate between them.
 
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 
 
 Assistant: 

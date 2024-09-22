@@ -64,6 +64,10 @@ To calculate record, use Wins and Losses, and you're going to have to add the mo
 
 The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
 
+The team in the Team column isn't always the home team, it could be the away team, so use HomeOrAway to determine if the team is the home team or the away team. This is very important for determining who is what team in the game.
+
+When querying coach, use the Team column to make sure you are getting the correct coach, and then you can use the HomeHeadCoach and AwayHeadCoach with HomeOrAway to determine the correct coach.
+
 </special_instructions_team_logs>
 
 <special_instructions_props> 
@@ -110,7 +114,7 @@ Make sure you surround columns with double quotes since it is case sensitive. An
 This is the current date: {current_date}
 For game days, you can use the Day column, if you don't have the time of the game. Make sure your date format is consistent with the data.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
-
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 
 
 Assistant: 

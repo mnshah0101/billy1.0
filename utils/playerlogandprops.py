@@ -121,6 +121,7 @@ Make sure you surround columns with double quotes since it is case sensitive. An
 This is the current date: {current_date}
 For game days, you can use the Day column, if you don't have the time of the game. Make sure your date format is consistent with the data.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 
 
 Assistant: 
