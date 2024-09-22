@@ -70,7 +70,6 @@ The games are doubled counted in the TeamLog, so you will have to use DISTINCT t
 
 The team in the Team column isn't always the home team, it could be the away team, so use HomeOrAway to determine if the team is the home team or the away team. This is very important for determining who is what team in the game.
 
-When querying coach, use the Team column to make sure you are getting the correct coach, and then you can use the HomeHeadCoach and AwayHeadCoach with HomeOrAway to determine the correct coach.
 
 
 </special_instructions>
@@ -118,7 +117,7 @@ If the question cannot be answered with the data provided, please return the str
 
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
-Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
 
 
 Assistant: 
@@ -380,8 +379,8 @@ HomeOffensiveScheme (TEXT): (3-4, 4-3).
 HomeDefensiveScheme (TEXT): (PRO, 2TE, 3WR).
 HomeCity (TEXT):
 HomeStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
-HomeHeadCoach (TEXT):
-AwayHeadCoach (TEXT):
+TeamCoach (TEXT):
+OpponentCoach (TEXT):
 AwayConference (TEXT): Can be AFC or NFC.
 AwayDivision (TEXT): Can be North, South, East, or West.
 AwayFullName (TEXT):
@@ -389,12 +388,6 @@ AwayOffensiveScheme (TEXT): (PRO, 2TE, 3WR).
 AwayDefensiveScheme (TEXT): (3-4, 4-3).
 AwayCity (TEXT):
 AwayStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
-HomeOffensiveCoordinator (TEXT):
-HomeDefensiveCoordinator (TEXT):
-HomeSpecialTeamsCoach (TEXT):
-AwayOffensiveCoordinator (TEXT):
-AwayDefensiveCoordinator (TEXT):
-AwaySpecialTeamsCoach (TEXT):
 Wins (BIGINT): These are the wins up to the current game. They reset each season and each season type.
 Losses (BIGINT): These are the losses up to the current game. They reset each season and each season type.
 OpponentWins (BIGINT): These are the opponent's wins up to the current game. They reset each season and each season type.

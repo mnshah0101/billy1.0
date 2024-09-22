@@ -181,7 +181,7 @@ If the question cannot be answered with the data provided, please return the str
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 Make sure you surround columns with double quotes since it is case sensitive. An example is p."PlayerName". 
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
-Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur' should be AND ("TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 
 Assistant: 
 

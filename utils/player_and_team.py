@@ -76,7 +76,6 @@ The games are doubled counted in the TeamLog, so you will have to use DISTINCT t
 
 Use the Team column to determine the team, and the HomeOrAway column to determine if the team is the home team or the away team. The Opponent column will have the opposite side.
 
-When querying coach, use the Team column to make sure you are getting the correct coach, and then you can use the HomeHeadCoach and AwayHeadCoach with HomeOrAway to determine the correct coach.
 
 </special_instructions>
 
@@ -107,7 +106,7 @@ This is a postgres database. Do not create any new columns or tables. Only refer
 
 There could be two players with the same name, so make sure to use the Team column to differentiate between them.
 
-Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
 
 
 Assistant: 
@@ -370,8 +369,8 @@ HomeOffensiveScheme (text)
 HomeDefensiveScheme (text)
 HomeCity (text)
 HomeStadiumDetails (text)
-HomeHeadCoach (text)
-AwayHeadCoach (text)
+TeamCoach (text)
+OpponentCoach (text)
 AwayConference (text)
 AwayDivision (text)
 AwayFullName (text)
@@ -379,12 +378,6 @@ AwayOffensiveScheme (text)
 AwayDefensiveScheme (text)
 AwayCity (text)
 AwayStadiumDetails (text)
-HomeOffensiveCoordinator (text)
-HomeDefensiveCoordinator (text)
-HomeSpecialTeamsCoach (text)
-AwayOffensiveCoordinator (text)
-AwayDefensiveCoordinator (text)
-AWaySpecialTeamsCoach (text)
 Wins (double precision) - These are the wins up to the current game. They reset each season and each season type.
 Losses (double precision) - These are the losses up to the current game. They reset each season and each season type.
 OpponentWins (double precision) - These are the opponent's wins up to the current game. They reset each season and each season type.

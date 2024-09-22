@@ -100,7 +100,7 @@ Use the attempted and made columns to calculate percentages. For example, if you
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided." 
 
 This is a postgres database. Do not create any new columns.
-Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur' should be AND ("HomeHeadCoach" = 'Matt LaFleur' OR "AwayHeadCoach" = 'Matt LaFleur') since the OR should be in parentheses.
+Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur' should be AND ("TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 
 Assistant: 
 
