@@ -72,6 +72,7 @@ To calculate record, use Wins and Losses, and you're going to have to add the mo
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
 Do not use the like operator, as this may lead to false positives.
 
+The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
 
 
 
@@ -100,7 +101,7 @@ Your response will be executed on a database of NFL Player Logs and NFL Team Log
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
 
-This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
+This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 
 There could be two players with the same name, so make sure to use the Team column to differentiate between them.
 
@@ -367,6 +368,7 @@ HomeDefensiveScheme (text)
 HomeCity (text)
 HomeStadiumDetails (text)
 HomeHeadCoach (text)
+AwayHeadCoach (text)
 AwayConference (text)
 AwayDivision (text)
 AwayFullName (text)
@@ -374,7 +376,6 @@ AwayOffensiveScheme (text)
 AwayDefensiveScheme (text)
 AwayCity (text)
 AwayStadiumDetails (text)
-AwayHeadCoach (text)
 HomeOffensiveCoordinator (text)
 HomeDefensiveCoordinator (text)
 HomeSpecialTeamsCoach (text)

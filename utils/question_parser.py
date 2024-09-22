@@ -49,7 +49,7 @@ Question: How many games did the 49ers win in 2005 regular season?
 
 This is the user inputted question: {user_question}
 
-If you need the most recently played season, it is the 2024 season. We have full season data for 2023, but we are in the midst of the 2024 season, so we have data for the weeks that have been played. For betting props, the only available information is in 2024 and we have future week data as well, but its not totally complete for some of the later weeks. If no season is specified, assume the most recent season and the Season Type to be the regular season unless said otherwise. For all props, the data is for 2024. For current season, use 2024.
+If you need the most recently played season, it is the 2024 season. We are in the midst of the 2024 season, so we have data for the weeks that have been played. For betting props, the only available information is in 2024 and we have future week data as well, but its not totally complete for some of the later weeks. If no season is specified, assume the most recent season and the Season Type to be the regular season unless said otherwise. For all props, the data is for 2024. For current season, use 2024.
 
 
 Remember, the tables have a lot of information, so if you think there is a chance the question could be answered by looking at the data, choose the appropriate bucket. If the question is not about the NFL choose NoBucket. If the question is not clear, make it more specific and easier to understand.

@@ -116,11 +116,11 @@ You may have to use the "like" operator to match player names, as the user may n
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
 
-This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 Make sure you surround columns with double quotes since it is case sensitive. An example is p."PlayerName". 
 This is the current date: {current_date}
 For game days, you can use the Day column, if you don't have the time of the game. Make sure your date format is consistent with the data.
+This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 
 
 Assistant: 

@@ -99,7 +99,7 @@ Use the attempted and made columns to calculate percentages. For example, if you
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided." 
 
-This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
+This is a postgres database. Do not create any new columns.
 
 Assistant: 
 

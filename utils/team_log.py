@@ -64,6 +64,9 @@ There is no weather column, so use a combination of temperature, humidity, and w
 
 To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
 
+
+The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
+
 </special_instructions>
 
 <question>
@@ -106,7 +109,9 @@ Use the Wins and Losses columns to determine the number of wins and losses for a
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
 
 
+
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
+This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 
 
 Assistant: 
@@ -369,6 +374,7 @@ HomeDefensiveScheme (TEXT): (PRO, 2TE, 3WR).
 HomeCity (TEXT):
 HomeStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
 HomeHeadCoach (TEXT):
+AwayHeadCoach (TEXT):
 AwayConference (TEXT): Can be AFC or NFC.
 AwayDivision (TEXT): Can be North, South, East, or West.
 AwayFullName (TEXT):
@@ -376,7 +382,6 @@ AwayOffensiveScheme (TEXT): (PRO, 2TE, 3WR).
 AwayDefensiveScheme (TEXT): (3-4, 4-3).
 AwayCity (TEXT):
 AwayStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
-AwayHeadCoach (TEXT):
 HomeOffensiveCoordinator (TEXT):
 HomeDefensiveCoordinator (TEXT):
 HomeSpecialTeamsCoach (TEXT):
