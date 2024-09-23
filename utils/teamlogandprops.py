@@ -351,9 +351,8 @@ OpponentBlockedKickReturnTouchdowns (DOUBLE PRECISION):
 OpponentFieldGoalReturnYards (DOUBLE PRECISION):
 OpponentFieldGoalReturnTouchdowns (DOUBLE PRECISION):
 OpponentPuntNetYards (DOUBLE PRECISION):
-IsGameOver (BIGINT):
-TeamName (TEXT):
-DayOfWeek (TEXT):
+TeamName (TEXT): The full name of the team (e.g. New England Patriots)
+DayOfWeek (TEXT) - The day of the week this game was played on (e.g. Sunday, Monday)
 PassingDropbacks (BIGINT):
 OpponentPassingDropbacks (BIGINT):
 TeamGameID (BIGINT):
