@@ -79,6 +79,8 @@ If asked for ranking, make sure you rank everyone in that position by the criter
 You can never not include the player name in the SQL query - doing so would be catastrophic.
 To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
 
+When asking about a player, assume that we want logs where the player has played, unless the question specifies otherwise like for injuries or missed games.
+
 </special_instructions>
 
 <question>

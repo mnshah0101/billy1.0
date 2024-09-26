@@ -78,6 +78,7 @@ Do not use the like operator, as this may lead to false positives.
 The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
 
 Use the Team column to determine the team, and the HomeOrAway column to determine if the team is the home team or the away team. The Opponent column will have the opposite side.
+When asking about a player, assume that we want logs where the player has played, unless the question specifies otherwise like for injuries or missed games.
 
 
 </special_instructions>

@@ -80,6 +80,7 @@ Never include the preseason in any of your responses, and make sure to include a
 If asked for ranking, make sure you rank everyone in that position by the criteria given and then output the rank of the player for that criteria. This is important.
 
 You can never not include the player name in the SQL query - doing so would be catastrophic.
+When asking about a player, assume that we want logs where the player has played, unless the question specifies otherwise like for injuries or missed games.
 
 </special_instructions_player_log>
 
