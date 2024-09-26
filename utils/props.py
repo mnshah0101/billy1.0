@@ -8,6 +8,8 @@ import time
 from langchain_anthropic import ChatAnthropic
 import re
 from datetime import datetime
+from utils.cache import get_closest_embedding
+
 
 props_metadata = """
 GlobalHomeTeamID (bigint) 
@@ -143,16 +145,13 @@ If the question cannot be answered with the data provided, return the string "ca
 
 This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
 
+
+Here is an example response for the question: {matched_question}
 <example_response>
 
 
 ```sql
-SELECT AVG(PointSpread) AS avg_home_point_spread
-FROM your_table_name
-WHERE OverUnder > 45
-  AND HasStarted = TRUE
-  AND IsOver = FALSE
-  AND PointSpread IS NOT NULL;
+{matched_sql_query}
 ```
 
 </example_response>
@@ -182,6 +181,10 @@ sql_prompt = PromptTemplate.from_template(prompt_template)
 
 def props_log_get_answer(model, question):
     llm = None
+
+    matched_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
+
+
     if model == 'openai':
         try:
             llm = ChatOpenAI(model='gpt-4o', temperature=0.96)
@@ -195,6 +198,6 @@ def props_log_get_answer(model, question):
     llm_chain = sql_prompt | llm
     print(sql_prompt)
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d-%H-%M-%S')})
+        {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d-%H-%M-%S'), 'matched_question': matched_question, 'matched_sql_query': matched_sql_query})
 
     return answer.content

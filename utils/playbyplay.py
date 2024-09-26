@@ -9,6 +9,8 @@ from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
+from utils.cache import get_closest_embedding
+
 import re
 prompt_template = ''
 
@@ -77,13 +79,11 @@ Given the database schema, here is the SQL query that answers `{user_question}`:
 
 </question>
 
-
+Here is an example response for the question: {matched_question}
 <example_response>
 
 ```sql
-SELECT SUM("RushingYards") AS Yards
-FROM playbyplay
-WHERE "Season" = 2023 AND "Name" = 'Patrick Mahomes'
+{matched_sql_query}
 ```
 
 </example_response>
@@ -101,6 +101,7 @@ If the question cannot be answered with the data provided, please return the str
 
 This is a postgres database. Do not create any new columns.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur' should be AND ("TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur') since the OR should be in parentheses.
+This is the current date: {current_date}.
 
 Assistant: 
 
@@ -225,6 +226,7 @@ ScoreID (double precision) - If this is a scoring play, the ScoreID (double prec
 
 def play_by_play_get_answer(model, question):
     llm = None
+    matched_question, matched_sql_query = get_closest_embedding(question)
     if model == 'openai':
         llm = ChatOpenAI(model='gpt-4o', temperature=0.9)
 
@@ -233,7 +235,7 @@ def play_by_play_get_answer(model, question):
 
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": testnfl_metadata})
+        {'user_question': question, "table_metadata_string": testnfl_metadata, "matched_question": matched_question, "matched_sql_query": matched_sql_query, "current_date": str(time.strftime("%Y-%m-%d"))})
 
     return answer.content
 

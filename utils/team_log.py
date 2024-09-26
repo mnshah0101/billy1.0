@@ -9,6 +9,7 @@ from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
 import re
+from utils.cache import get_closest_embedding
 
 
 # Define the prompt template
@@ -81,27 +82,16 @@ Given the database schema, here is the SQL query that answers `{user_question}`:
 
 </question>
 
-Here is an example response for the question: "Ravens record against the spread vs teams with winning records"
 
 If the question cannot be answered with the data provided, return the string "cannot be answered".
 
 This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
-
+Here is an example response for the question: {matched_question}
 <example_response>
 
 
 ```sql
-SELECT
-    SUM(CASE WHEN ("Score" + "PointSpread") > "OpponentScore" THEN 1 ELSE 0 END) AS WinsAgainstSpread,
-    SUM(CASE WHEN ("Score" + "PointSpread") < "OpponentScore" THEN 1 ELSE 0 END) AS LossesAgainstSpread,
-    SUM(CASE WHEN ("Score" + "PointSpread") = "OpponentScore" THEN 1 ELSE 0 END) AS PushesAgainstSpread
-FROM
-    teamlog
-WHERE
-    "Season" = 2023
-    AND "SeasonType" = 1
-    AND "Team" = 'BAL'
-    AND "OpponentWins" > OpponentLosses;
+{matched_sql_query}
 ```
 
 </example_response>
@@ -117,6 +107,7 @@ If the question cannot be answered with the data provided, please return the str
 
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
+This is today's date: {current_date}. If the question mentions today, or tonight or anything of the sort, include this date in the response.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
 
 
@@ -407,6 +398,7 @@ IsShortWeek (BIGINT): 1 if the team is playing on a short week, 0 if not.
 
 def team_log_get_answer(model, question):
     llm = None
+    matched_question, matched_sql_query = get_closest_embedding(question, top_k=1)
     if model == 'openai':
         llm = ChatOpenAI(model='gpt-4o', temperature=0.9)
 
@@ -416,7 +408,7 @@ def team_log_get_answer(model, question):
 
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": testnfl_metadata})
+        {'user_question': question, "table_metadata_string": testnfl_metadata, "matched_question": matched_question, "matched_sql_query": matched_sql_query, "current_date": str(time.strftime("%Y-%m-%d"))})
 
     return answer.content
 

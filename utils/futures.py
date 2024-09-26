@@ -7,6 +7,8 @@ from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
 import re
+from utils.cache import get_closest_embedding
+
 
 futures_metadata = """
 PlayerID (double precision) - If this is a player future, this is the unique identifier for the player
@@ -149,22 +151,17 @@ Given the database schema, here is the SQL query that answers `{user_question}`:
 </question>
 
 
-Here is an example response for the question: "What is the average point spread for home teams in games where the over/under is greater than 45 and the game has already started but is not yet over?"
 
 If the question cannot be answered with the data provided, return the string "cannot be answered".
 
 This is a postgres database. Do not create any new columns or tables. Only use the columns that are in the table.
 
+Here is an example response for the question: {matched_user_question}
 <example_response>
 
 
 ```sql
-SELECT AVG(PointSpread) AS avg_home_point_spread
-FROM your_table_name
-WHERE OverUnder > 45
-  AND HasStarted = TRUE
-  AND IsOver = FALSE
-  AND PointSpread IS NOT NULL;
+{matched_sql_query}
 ```
 
 </example_response>
@@ -192,6 +189,7 @@ sql_prompt = PromptTemplate.from_template(prompt_template)
 
 def futures_log_get_answer(model, question):
     llm = None
+    matched_user_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
     if model == 'openai':
         try:
             llm = ChatOpenAI(model='gpt-4o', temperature=0.96)
@@ -204,6 +202,6 @@ def futures_log_get_answer(model, question):
     print(llm)
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": futures_metadata})
+        {'user_question': question, "table_metadata_string": futures_metadata, "matched_user_question": matched_user_question, "matched_sql_query": matched_sql_query, "current_date": str(time.strftime("%Y-%m-%d"))})
 
     return answer.content

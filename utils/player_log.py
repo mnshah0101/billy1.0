@@ -5,9 +5,11 @@ import requests
 from langchain.agents import initialize_agent, AgentExecutor
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-import time
+import datetime
 from langchain_anthropic import ChatAnthropic
 import re
+from utils.cache import get_closest_embedding
+
 prompt_template = """
 
 User:
@@ -86,13 +88,11 @@ Given the database schema, here is the SQL query that answers `{user_question}`:
 
 </question>
 
-
+Here is an example response for the question {matched_question}:
 <example_response>
 
 ```sql
-SELECT SUM("RushingYards") AS Yards
-FROM playerlog
-WHERE "Season" = 2023 AND "Name" = 'Patrick Mahomes'
+{matched_sql_query}
 ```
 
 </example_response>
@@ -102,7 +102,7 @@ Your response will be executed on a database of NFL Player Logs and the answer w
 You may have to use the "like" operator to match player names, as the user may not provide the full name of the player or the database may have a different format for the player name.
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
-
+This is the current date: {current_date}
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur' should be AND ("TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 
@@ -232,7 +232,6 @@ MiscFumblesForced (double precision)
 MiscFumblesRecovered (double precision)
 ShortName (text)
 PlayingSurface (text) - Artificial or Grass
-IsGameOver (bigint)
 SafetiesAllowed (double precision)
 Stadium (text)
 Temperature (double precision)
@@ -301,6 +300,7 @@ Experience (double precision) - The number of years the player has played in the
 
 def player_log_get_answer(model, question):
     llm = None
+    matched_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
     if model == 'openai':
         try:
             llm = ChatOpenAI(model='gpt-4o', temperature=0.96)
@@ -313,6 +313,6 @@ def player_log_get_answer(model, question):
     print(llm)
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-        {'user_question': question, "table_metadata_string": testnfl_metadata})
+        {'user_question': question, "table_metadata_string": testnfl_metadata, "matched_question": matched_question, "matched_sql_query": matched_sql_query, "current_date": str(datetime.datetime.today()).split()[0]})
 
     return answer.content

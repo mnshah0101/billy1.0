@@ -10,6 +10,9 @@ from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
 import re
+from utils.cache import get_closest_embedding
+import datetime
+
 prompt_template = """
 
 User:
@@ -86,13 +89,12 @@ Given the database schema, here is the SQL query that answers `{user_question}`:
 
 </question>
 
+Here is an example response for the question: {matched_question}
 
 <example_response>
 
 ```sql
-SELECT SUM("RushingYards") AS Yards
-FROM playerlog
-WHERE "Season" = 2023 AND "Name" = 'Patrick Mahomes'
+{matched_sql_query}
 ```
 
 </example_response>
@@ -106,6 +108,7 @@ This is a postgres database. Do not create any new columns or tables. Only refer
 
 There could be two players with the same name, so make sure to use the Team column to differentiate between them.
 
+This is the current date: {current_date}
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
 
 
@@ -345,9 +348,8 @@ OpponentBlockedKickReturnTouchdowns (double precision)
 OpponentFieldGoalReturnYards (double precision)
 OpponentFieldGoalReturnTouchdowns (double precision)
 OpponentPuntNetYards (double precision)
-IsGameOver (bigint)
-TeamName (text)
-DayOfWeek (text)
+TeamName (text) - The full name of the team (e.g. New England Patriots)
+DayOfWeek (text) - The day of the week this game was played on (e.g. Sunday, Monday)
 PassingDropbacks (double precision)
 OpponentPassingDropbacks (double precision)
 TeamGameID (double precision)
@@ -511,7 +513,6 @@ MiscFumblesForced (double precision)
 MiscFumblesRecovered (double precision)
 ShortName (text)
 PlayingSurface (text) - Artificial or Grass
-IsGameOver (bigint)
 SafetiesAllowed (double precision)
 Stadium (text)
 Temperature (double precision)
@@ -594,6 +595,11 @@ Experience (double precision) - The number of years the player has played in the
 
 def player_and_team_log_get_answer(model, question):
     llm = None
+
+    matched_question, matched_sql_query = get_closest_embedding(
+        question, top_k=1)
+
+
     if model == 'openai':
         llm = ChatOpenAI(model='gpt-4o', temperature=0.9)
 
@@ -602,7 +608,7 @@ def player_and_team_log_get_answer(model, question):
 
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-    {'user_question': question, "table_metadata_string": testnfl_metadata})
+        {'user_question': question, "table_metadata_string": testnfl_metadata, "matched_question": matched_question, "matched_sql_query": matched_sql_query, "current_date": str(datetime.datetime.today()).split()[0]})
 
     return answer.content
 

@@ -9,6 +9,8 @@ import time
 from langchain_anthropic import ChatAnthropic
 import re
 import datetime
+from utils.cache import get_closest_embedding
+
 prompt_template = """
 
 User:
@@ -86,20 +88,12 @@ Given the database schema, here is the SQL query that answers `{user_question}`:
 </question>
 
 
+Here is an example response for the question: {matched_question}
+
 <example_response>
 
 ```sql
-SELECT
-    SUM(CASE WHEN ("Score" + "PointSpread") > "OpponentScore" THEN 1 ELSE 0 END) AS WinsAgainstSpread,
-    SUM(CASE WHEN ("Score" + "PointSpread") < "OpponentScore" THEN 1 ELSE 0 END) AS LossesAgainstSpread,
-    SUM(CASE WHEN ("Score" + "PointSpread") = "OpponentScore" THEN 1 ELSE 0 END) AS PushesAgainstSpread
-FROM
-    teamlog
-WHERE
-    "Season" = 2023
-    AND "SeasonType" = 1
-    AND "Team" = 'BAL'
-    AND "OpponentWins" > OpponentLosses;
+{matched_sql_query}
 ```
 </example_response>
 
@@ -497,6 +491,10 @@ MoneyPercentage (double precision) - Percentage of money on this outcome, a lot 
 
 def team_log_and_props_get_answer(model, question):
     llm = None
+
+    matched_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
+
+
     if model == 'openai':
         try:
             llm = ChatOpenAI(model='gpt-4o', temperature=0.96)
@@ -509,6 +507,6 @@ def team_log_and_props_get_answer(model, question):
     print(llm)
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
-        {'user_question': question, "player_log_table_metadata_string": testnfl_metadata, "props_table_metadata_string": props_metadata, "current_date": str(datetime.datetime.today()).split()[0]})
+        {'user_question': question, "player_log_table_metadata_string": testnfl_metadata, "props_table_metadata_string": props_metadata, "current_date": str(datetime.datetime.today()).split()[0]}, matched_question=matched_question, matched_sql_query=matched_sql_query)
 
     return answer.content
