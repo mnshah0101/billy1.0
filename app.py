@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+import json
 from flask_cors import CORS
 from utils.question_parser import question_chooser
 from utils.team_log import team_log_get_answer
@@ -303,6 +304,162 @@ def chat_http(data):
             answerGenerating = False
 
     return answer_string
+
+# Route to store chats
+
+
+@app.route('/post-chats', methods=['POST'])
+def store_chats():
+    # Sample input:
+    # {
+    #     "user_id": "123",
+    #     "messages": [
+    #         {"message": "test", "sender": "user"},
+    #         {"message": "test2", "sender": "billy"}
+    #     ],
+    #      "name": "Ronit"
+    #       "sql_query": "SELECT(*) FROM *"
+    #       "chat_id": "123123"
+    # }
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    required_fields = ['user_id', 'messages', 'name', 'sql_query', 'chat_id']
+
+    # Check if user_id and chat are provided
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'{field} not found in request data'}), 400
+
+    user = data['user_id']
+    messages = data['messages']
+    name = data['name']
+    sql_query = data['sql_query']
+    chat_id = data['chat_id']
+
+    try:
+        # Insert into 'chats' table, automatically sets 'created_at'
+        # Insert into 'chats' table
+        response = supabase.table('chats').upsert({
+            "messages": messages,
+            "user_id": user,
+            "name": name,
+            "sql_query": sql_query,
+            "id": chat_id,
+        }).execute()
+
+        if hasattr(response, 'error') and response.error:
+            return jsonify({"error": str(response.error)}), 500
+
+        response = supabase.table('profiles').select(
+            'chats').eq('user_id', user).execute()
+
+        if hasattr(response, 'error') and response.error:
+            return jsonify({"error": str(response.error)}), 500
+
+        if response.data:
+            current_chats = response.data[0].get('chats') or []
+        else:
+            return jsonify({"error": "User profile not found"}), 404
+
+        if chat_id not in current_chats:
+            # Append 'chat_id' to 'current_chats'
+            current_chats.append(chat_id)
+
+            # Update the 'chats' array in 'profiles' table
+            response = supabase.table('profiles').update({
+                "chats": current_chats
+            }).eq('user_id', user).execute()
+
+            if hasattr(response, 'error') and response.error:
+                return jsonify({"error": str(response.error)}), 500
+
+            return jsonify({"message": "Chat added successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"message": "Chat added successfully"}), 200
+
+
+# Route to retrieve all chats for a user
+@app.route('/retrieve-all-chats', methods=['POST'])
+def retrieve_all_chats():
+    # Sample input:
+    # {
+    #     "user_id": "123"
+    # }
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'user_id not found in request data'}), 400
+
+    try:
+        # Check if the user exists in the profiles table
+        user_check = supabase.table('profiles').select(
+            'user_id').eq('user_id', user_id).execute()
+
+        if not user_check.data:
+            return jsonify({"error": "User not found"}), 404
+
+        # Query the chats table to get chats for the given user_id
+        response = supabase.table('chats').select(
+            '*').eq('user_id', user_id).execute()
+
+        if hasattr(response, 'error') and response.error:
+            return jsonify({"error": str(response.error)}), 500
+
+        chats = response.data if response.data else []
+
+        # Return all chats associated with the user
+        return jsonify({"chats": chats}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Route to retrieve a specific chat by chat_id
+
+
+@app.route('/retrieve-chat', methods=['POST'])
+def retrieve_chat():
+    # Sample input:
+    # {
+    #     "chat_id": "your_chat_id_here"
+    # }
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    chat_id = data.get('chat_id')
+    if not chat_id:
+        return jsonify({'error': 'chat_id not found in request data'}), 400
+
+    try:
+        # Query the chats table to retrieve the specific chat by chat_id
+        response = supabase.table('chats').select(
+            '*').eq('id', chat_id).execute()
+
+        if hasattr(response, 'error') and response.error:
+            return jsonify({"error": str(response.error)}), 500
+
+        chat = response.data[0] if response.data else None
+        if not chat:
+            return jsonify({"error": "Chat not found"}), 404
+
+        # Extract the 'messages' field from the chat data
+        messages = chat.get('messages', [])
+
+        return jsonify({"chat": messages}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

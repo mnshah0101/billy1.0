@@ -84,6 +84,8 @@ When asking about a player, assume that we want logs where the player has played
 
 </special_instructions_player_log>
 
+
+
 <special_instructions_props> 
 The name of the table is props. 
 
