@@ -69,7 +69,7 @@ Usually, even when a player is out or injured, they will have a record in the da
 Be careful of periods in the player name. For example, TJ Watt is T.J. Watt in the database.
 
 All columns must be surrounded by double quotes, such as "Name" or "Team".
-To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
+To calculate record, use WinsAfter for record after the game and Wins for record before the game. The same goes for losses.
 
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
@@ -385,6 +385,10 @@ Wins (double precision) - These are the wins up to the current game. They reset 
 Losses (double precision) - These are the losses up to the current game. They reset each season and each season type.
 OpponentWins (double precision) - These are the opponent's wins up to the current game. They reset each season and each season type.
 OpponentLosses (double precision) - These are the opponent's losses up to the current game. They reset each season and each season type.
+Wins_After (BIGINT): These are the wins after the current game. They reset each season and each season type.
+Losses_After (BIGINT): These are the losses after the current game. They reset each season and each season type.
+OpponentWins_After (BIGINT): These are the opponent's wins after the current game. They reset each season and each season type.
+OpponentLosses_After (BIGINT): These are the opponent's losses after the current game. They reset each season and each season type.
 IsShortWeek (bigint) - 1 if the team has a short week, 0 otherwise
 StadiumID (bigint)
 Name (text) - Home team Stadium Name

@@ -63,8 +63,7 @@ All columns must be surrounded by double quotes, such as "Name" or "Team".
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
 
-To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
-
+To calculate record, use WinsAfter for record after the game and Wins for record before the game. The same goes for losses.
 
 The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
 
@@ -382,6 +381,10 @@ Wins (BIGINT): These are the wins up to the current game. They reset each season
 Losses (BIGINT): These are the losses up to the current game. They reset each season and each season type.
 OpponentWins (BIGINT): These are the opponent's wins up to the current game. They reset each season and each season type.
 OpponentLosses (BIGINT): These are the opponent's losses up to the current game. They reset each season and each season type.
+Wins_After (BIGINT): These are the wins after the current game. They reset each season and each season type.
+Losses_After (BIGINT): These are the losses after the current game. They reset each season and each season type.
+OpponentWins_After (BIGINT): These are the opponent's wins after the current game. They reset each season and each season type.
+OpponentLosses_After (BIGINT): These are the opponent's losses after the current game. They reset each season and each season type.
 StadiumID (BIGINT):
 Name (TEXT): Home team Stadium Name.
 City (TEXT): Home team City.
