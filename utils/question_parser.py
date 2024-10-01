@@ -58,7 +58,7 @@ If you choose NoBucket, instead of a question in the question field, put the rea
 
 If you choose Conversation, instead of a question in the question field, put the natural conversation you would have with the user. 
 If you need the current date, it is {current_date}. If the questions mentions today, or tonight or anything of the sort, include this date in the response.
-
+We just finished week 4 of the 2024 season.
 
 
 </prompt>
