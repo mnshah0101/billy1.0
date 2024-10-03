@@ -4,6 +4,7 @@ from langchain_openai import OpenAI, ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from dotenv import load_dotenv
 import datetime
+from utils.CountUtil import count_tokens
 
 load_dotenv()
 
@@ -71,6 +72,11 @@ billy_prompt = PromptTemplate.from_template(prompt_template)
 
 
 def question_chooser(model, question):
+
+    input_count = count_tokens(question)
+    input_count += count_tokens(prompt_template)
+
+
     current_date = str(datetime.datetime.today()).split()[0]
     print('Question: ' + question)
     start = time.time()
@@ -87,11 +93,16 @@ def question_chooser(model, question):
 
     llm_response = llm_chain.invoke({'user_question': question, 'current_date': current_date})
 
-    print(llm_response.content)
 
-    print(str(time.time() - start) + ' seconds')
+    response_text = llm_response.content
 
-    return extract_bucket_and_question(llm_response.content)
+    output_count = count_tokens(response_text)
+
+    bucket, question = extract_bucket_and_question(response_text)
+
+  
+
+    return bucket, question, input_count, output_count
 
 
 def extract_bucket_and_question(input_string):

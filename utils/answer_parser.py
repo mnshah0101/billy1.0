@@ -91,19 +91,13 @@ def get_answer(model, question, query, sql_response):
     llm = None
     if model == 'openai':
         llm = ChatOpenAI(model='gpt-4o')
-
     elif model == 'anthropic':
-        llm = ChatAnthropic(model_name='claude-3-opus-20240229',
-                            )
+        llm = ChatAnthropic(model_name='claude-3-opus-20240229')
 
     llm_chain = billy_prompt | llm
 
-    answer = ''
-
+    # This will act as a generator
     for s in llm_chain.stream(
             {'user_question': question, "sql_query": query, "result": sql_response}):
         print(s.content)
-        yield s.content
-        answer += str(s.content)
-
-    return 
+        yield s.content  # Keep yielding parts of the response

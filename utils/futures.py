@@ -8,6 +8,7 @@ import time
 from langchain_anthropic import ChatAnthropic
 import re
 from utils.cache import get_closest_embedding
+from utils.CountUtil import count_tokens
 
 
 futures_metadata = """
@@ -189,7 +190,12 @@ sql_prompt = PromptTemplate.from_template(prompt_template)
 
 def futures_log_get_answer(model, question):
     llm = None
+    input_count = count_tokens(question)
+    input_count += count_tokens(prompt_template)
+    input_count += count_tokens(futures_metadata)
     matched_user_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
+    input_count += count_tokens(matched_user_question)
+    input_count += count_tokens(matched_sql_query)
     if model == 'openai':
         try:
             llm = ChatOpenAI(model='gpt-4o', temperature=0.96)
@@ -203,5 +209,5 @@ def futures_log_get_answer(model, question):
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
         {'user_question': question, "table_metadata_string": futures_metadata, "matched_user_question": matched_user_question, "matched_sql_query": matched_sql_query, "current_date": str(time.strftime("%Y-%m-%d"))})
-
-    return answer.content
+    output_count = count_tokens(answer.content) 
+    return answer.content, input_count, output_count

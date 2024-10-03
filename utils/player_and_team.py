@@ -12,6 +12,7 @@ from langchain_anthropic import ChatAnthropic
 import re
 from utils.cache import get_closest_embedding
 import datetime
+from utils.CountUtil import count_tokens
 
 prompt_template = """
 
@@ -600,9 +601,16 @@ Experience (double precision) - The number of years the player has played in the
 
 def player_and_team_log_get_answer(model, question):
     llm = None
+    input_count = count_tokens(question)
+    input_count += count_tokens(prompt_template)
+    input_count += count_tokens(testnfl_metadata)
+    
 
     matched_question, matched_sql_query = get_closest_embedding(
         question, top_k=1)
+    
+    input_count += count_tokens(matched_question)
+    input_count += count_tokens(matched_sql_query)
 
 
     if model == 'openai':
@@ -614,7 +622,8 @@ def player_and_team_log_get_answer(model, question):
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
         {'user_question': question, "table_metadata_string": testnfl_metadata, "matched_question": matched_question, "matched_sql_query": matched_sql_query, "current_date": str(datetime.datetime.today()).split()[0]})
-
-    return answer.content
+    return_answer = answer.content
+    output_count = count_tokens(return_answer)
+    return return_answer, input_count, output_count
 
 

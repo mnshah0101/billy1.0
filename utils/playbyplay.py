@@ -10,6 +10,7 @@ from langchain_openai import ChatOpenAI
 import time
 from langchain_anthropic import ChatAnthropic
 from utils.cache import get_closest_embedding
+from utils.CountUtil import count_tokens
 
 import re
 prompt_template = ''
@@ -226,7 +227,17 @@ ScoreID (double precision) - If this is a scoring play, the ScoreID (double prec
 
 def play_by_play_get_answer(model, question):
     llm = None
+
+    input_count = count_tokens(question)
+    input_count += count_tokens(prompt_template)
+    input_count += count_tokens(testnfl_metadata)
+    
     matched_question, matched_sql_query = get_closest_embedding(question)
+
+    input_count += count_tokens(matched_question)
+    input_count += count_tokens(matched_sql_query)
+
+
     if model == 'openai':
         llm = ChatOpenAI(model='gpt-4o', temperature=0.9)
 
@@ -236,6 +247,6 @@ def play_by_play_get_answer(model, question):
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
         {'user_question': question, "table_metadata_string": testnfl_metadata, "matched_question": matched_question, "matched_sql_query": matched_sql_query, "current_date": str(time.strftime("%Y-%m-%d"))})
-
-    return answer.content
+    output_count = count_tokens(answer.content)
+    return answer.content, input_count, output_count
 

@@ -10,6 +10,7 @@ from langchain_anthropic import ChatAnthropic
 import re
 import datetime
 from utils.cache import get_closest_embedding
+from utils.CountUtil import count_tokens
 
 prompt_template = """
 
@@ -496,7 +497,17 @@ MoneyPercentage (double precision) - Percentage of money on this outcome, a lot 
 def team_log_and_props_get_answer(model, question):
     llm = None
 
+    input_count = count_tokens(question)
+    input_count += count_tokens(prompt_template)
+    input_count += count_tokens(testnfl_metadata)
+    input_count += count_tokens(props_metadata)
+
+
     matched_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
+
+    input_count += count_tokens(matched_question)
+    input_count += count_tokens(matched_sql_query)
+
 
 
     if model == 'openai':
@@ -512,5 +523,10 @@ def team_log_and_props_get_answer(model, question):
     llm_chain = sql_prompt | llm
     answer = llm_chain.invoke(
         {'user_question': question, "player_log_table_metadata_string": testnfl_metadata, "props_table_metadata_string": props_metadata, "current_date": str(datetime.datetime.today()).split()[0]}, matched_question=matched_question, matched_sql_query=matched_sql_query)
+    
+    return_answer = answer.content
 
-    return answer.content
+    output_count = count_tokens(return_answer)
+
+
+    return return_answer, input_count, output_count

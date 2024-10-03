@@ -15,6 +15,7 @@ from utils.teamlogandprops import team_log_and_props_get_answer
 from utils.props import props_log_get_answer
 from utils.perplexity import ask_expert
 from utils.futures import futures_log_get_answer
+from utils.CountUtil import count_tokens
 from flask import request
 import tiktoken
 from supabase import create_client, Client
@@ -43,10 +44,6 @@ socketio = SocketIO(app, cors_allowed_origins='*')
 global_bucket = None
 
 
-def count_tokens(string: str) -> int:
-    encoding = tiktoken.get_encoding("o200k_base")
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
 
 def handle_errors(func):
     @wraps(func)
@@ -98,8 +95,10 @@ def process_database_query(bucket, question):
     get_answer_func = bucket_to_function.get(bucket)
     if not get_answer_func:
         raise ValueError(f"Unknown bucket: {bucket}")
+    
 
-    raw_query = get_answer_func('anthropic', question)
+
+    raw_query, sql_input_tokens, sql_output_tokens = get_answer_func('anthropic', question)
     if 'error' in raw_query.lower() or 'cannot' in raw_query.lower():
         return process_expert_analysis(question)
 
@@ -111,9 +110,13 @@ def process_database_query(bucket, question):
     tokens = count_tokens(str(result))
     if tokens > 5000:
         return process_expert_analysis(question)
+    
+    answer_input_tokens = count_tokens(question) + count_tokens(raw_query) + count_tokens(str(result)) + 700
 
+    print("running up to get_answer")
 
-    return get_answer('openai', question, query, result)
+    
+    return get_answer('openai', question, query, result), sql_input_tokens, sql_output_tokens, answer_input_tokens
 
 
 @socketio.on('billy')
@@ -131,7 +134,7 @@ def chat(data):
     print(f"IP: {ip}")
     print(f"Session: {session}")
 
-    bucket, question = question_chooser('anthropic', message)
+    bucket, question, question_chooser_input_count, question_chooser_output_count = question_chooser('anthropic', message)
     print(f"Bucket: {bucket}")
     print(f"Question: {question}")
 
@@ -152,19 +155,46 @@ def chat(data):
     if bucket == 'ExpertAnalysis':
         return process_expert_analysis(question)
     
+    
     try:
 
-        answer_generator = process_database_query(bucket, question)
+        answer_generator, input_sql_tokens, output_sql_tokens, answer_input_tokens = process_database_query(bucket, question)
         answer_string = ''
         for next_answer in answer_generator:
             answer_string += next_answer
             emit('billy', {'response': answer_string, 'type': 'answer',
                 'status': 'generating', 'bucket': bucket})
 
-        
 
         emit('billy', {'response': answer_string,
             'type': 'answer', 'status': 'done'})
+        
+        #store_query()
+        print(f"Input SQL Tokens: {input_sql_tokens}")
+        print(f"Output SQL Tokens: {output_sql_tokens}")
+        print(f"Question Chooser Input Tokens: {question_chooser_input_count}")
+        print(f"Question Chooser Output Tokens: {question_chooser_output_count}")
+        print(f"Answer Input Tokens: {answer_input_tokens}")
+
+        answer_output_tokens = count_tokens(answer_string)
+        
+        #TODO: Store the chat in the db with 
+        supabase.table('billy_answers').insert({
+            'question': question,
+            'bucket': bucket,
+            'sql_query': question,
+            'answer': answer_string,
+            'question_parser_input_tokens': question_chooser_input_count,
+            'question_parser_output_tokens': question_chooser_output_count,
+            'sql_input_tokens': input_sql_tokens,
+            'sql_output_tokens': output_sql_tokens,
+            'answer_input_tokens': answer_input_tokens,
+            'answer_output_tokens': answer_output_tokens
+        }).execute()
+
+
+
+    
         return answer_string
     except Exception as e:
         emit('billy', {
@@ -241,71 +271,7 @@ def store_query():
         return jsonify({'error': 'Could not store/update query', 'details': str(e)}), 500
 
 
-@app.route('/chat',  methods=["POST"])
-def chat_http(data):
-    if 'message' not in data:
-        emit('billy', {'response': 'I am sorry, I do not have an answer for that question.',
-             'type': 'query', 'status': 'done'})
-        return
 
-    message = data['message']
-
-    while True:
-        try:
-            # Call the question_chooser function to get the bucket and question
-            bucket, question = question_chooser('anthropic', message)
-
-            print(f'Bucket: {bucket}')
-            print(f'Question: {question}')
-
-            if bucket == 'NoBucket':
-                emit('billy', {
-                    'response': "I am sorry, I do not have an answer for that question.", 'type': 'answer', 'status': 'done'})
-                return
-
-            raw_query = None
-
-            if bucket == 'TeamGameLog':
-                raw_query = team_log_get_answer('anthropic', question)
-            elif bucket == 'PlayerGameLog':
-                raw_query = player_log_get_answer('anthropic', question)
-            elif bucket == 'PlayByPlay':
-                raw_query = play_by_play_get_answer('anthropic', question)
-            elif bucket == 'TeamAndPlayerLog':
-                raw_query = player_and_team_log_get_answer(
-                    'anthropic', question)
-
-            # Extract the SQL query from the raw_query
-            query = extract_sql_query(raw_query)
-
-            emit('billy', {'response': query,
-                           'type': 'query', 'status': 'generating'})
-
-            # Execute the SQL query
-            result = execute_query(query)
-
-            # If execution reaches here, the query was successful, break the loop
-            break
-
-        except Exception as e:
-            print(f'Error: {e}. Retrying...')
-
-    answer = get_answer('anthropic', question, query, result)
-
-    answerGenerating = True
-    answer_string = ''
-
-    while answerGenerating:
-        try:
-            next_answer = next(answer)
-            answer_string += next_answer
-
-        except Exception as e:
-            answerGenerating = False
-
-    return answer_string
-
-# Route to store chats
 
 
 @app.route('/post-chats', methods=['POST'])

@@ -9,6 +9,7 @@ from langchain_anthropic import ChatAnthropic
 import re
 from datetime import datetime
 from utils.cache import get_closest_embedding
+from utils.CountUtil import count_tokens
 
 
 props_metadata = """
@@ -181,8 +182,18 @@ sql_prompt = PromptTemplate.from_template(prompt_template)
 
 def props_log_get_answer(model, question):
     llm = None
+    input_count = count_tokens(question)
+    input_count += count_tokens(prompt_template)
+    input_count += count_tokens(props_metadata)
+
+
+
+
 
     matched_question, matched_sql_query = get_closest_embedding(question, model="text-embedding-3-large", top_k=1)
+
+    input_count += count_tokens(matched_question)
+    input_count += count_tokens(matched_sql_query)
 
 
     if model == 'openai':
@@ -199,5 +210,6 @@ def props_log_get_answer(model, question):
     print(sql_prompt)
     answer = llm_chain.invoke(
         {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d-%H-%M-%S'), 'matched_question': matched_question, 'matched_sql_query': matched_sql_query})
+    output_count = count_tokens(answer.content)
 
     return answer.content
