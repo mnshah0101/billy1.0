@@ -177,6 +177,12 @@ def chat(data):
         print(f"Answer Input Tokens: {answer_input_tokens}")
 
         answer_output_tokens = count_tokens(answer_string)
+
+        #cost is sum(inputs) * (3.50/1,000,000) + sum(outputs) * (15/1,000,000)
+
+
+
+        cost = (question_chooser_input_count + input_sql_tokens + answer_input_tokens) * (3.50/1000000) + (question_chooser_output_count + output_sql_tokens + answer_output_tokens) * (15/1000000)
         
         #TODO: Store the chat in the db with 
         supabase.table('billy_answers').insert({
@@ -189,7 +195,8 @@ def chat(data):
             'sql_input_tokens': input_sql_tokens,
             'sql_output_tokens': output_sql_tokens,
             'answer_input_tokens': answer_input_tokens,
-            'answer_output_tokens': answer_output_tokens
+            'answer_output_tokens': answer_output_tokens,
+            'cost': cost,
         }).execute()
 
 
