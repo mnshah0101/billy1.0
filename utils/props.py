@@ -216,4 +216,4 @@ def props_log_get_answer(model, question):
         {'user_question': question, "table_metadata_string": props_metadata, 'current_date': datetime.now().strftime('%Y-%m-%d-%H-%M-%S'), 'matched_question': matched_question, 'matched_sql_query': matched_sql_query})
     output_count = count_tokens(answer.content)
 
-    return answer.content
+    return answer.content, input_count, output_count
