@@ -10,6 +10,10 @@ import re
 from datetime import datetime
 from utils.cache import get_closest_embedding
 from utils.CountUtil import count_tokens
+import dotenv
+dotenv.load_dotenv()
+
+add_line = os.getenv('ADD_LINE')
 
 
 props_metadata = """
@@ -102,7 +106,6 @@ BettingOutcomeType (text) - Could be ['Over', 'Under', 'Away', 'Home', nan, 'Yes
 SportsbookUrl (text) - URL to the sportsbook's page for this game or bet
 BetPercentage (double precision) - Percentage of bets on this outcome, a lot of these are NaN, but some are not
 MoneyPercentage (double precision) - Percentage of money on this outcome, a lot of these are NaN, but some are not
-
 """
 
 
@@ -172,11 +175,12 @@ This is the current date: {current_date}
 For game days, you can use the Day column, if you don't have the time of the game. Make sure your date format is consistent with the data.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur' should be AND ("TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur') since the OR should be in parentheses.
-
-Assistant: 
-
-
 """
+
+prompt_template += add_line
+prompt_template += "Assistant: "
+
+
 sql_prompt = PromptTemplate.from_template(prompt_template)
 
 

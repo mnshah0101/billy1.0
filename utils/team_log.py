@@ -11,6 +11,12 @@ from langchain_anthropic import ChatAnthropic
 import re
 from utils.cache import get_closest_embedding
 from utils.CountUtil import count_tokens
+import dotenv
+dotenv.load_dotenv()
+
+add_line = os.getenv('ADD_LINE')
+
+
 
 
 # Define the prompt template
@@ -109,11 +115,10 @@ Do not use functions that are not available in SQLite. Do not use functions that
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 This is today's date: {current_date}. If the question mentions today, or tonight or anything of the sort, include this date in the response.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
-
-
-Assistant: 
-
 """
+
+prompt_template += add_line
+prompt_template += "Assistant:"
 
 
 sql_prompt = PromptTemplate.from_template(prompt_template)

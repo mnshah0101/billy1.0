@@ -10,6 +10,8 @@ load_dotenv()
 
 
 
+
+
 # Define the prompt template
 prompt_template = """
 <prompt>
@@ -59,9 +61,8 @@ If you choose NoBucket, instead of a question in the question field, put the rea
 
 If you choose Conversation, instead of a question in the question field, put the natural conversation you would have with the user. 
 If you need the current date, it is {current_date}. If the questions mentions today, or tonight or anything of the sort, include this date in the response.
-We just finished week 4 of the 2024 season.
-
-
+We just finished week 4 of the 2024 season and are currently in week 5. The 2024 season is the most recent season. We only have performance data up to the weeks that have been played, so use internet tool when asking for weeks that haven't been played. For props, we have data for the 2024 season and future weeks, but it is not totally complete for some of the later weeks. 
+Remember, players may have moved teams since when you were last trained, so don't assume you know where players play all the time and still choose an appropriate bucket.
 </prompt>
 """
 
@@ -83,7 +84,7 @@ def question_chooser(model, question):
 
     llm = None
     if model == 'openai':
-        llm = ChatOpenAI(model='gpt-4', temperature=0.7)
+        llm = ChatOpenAI(model='gpt-4', temperature=0.3)
 
     elif model == 'anthropic':
         llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=0.5,

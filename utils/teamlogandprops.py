@@ -11,6 +11,10 @@ import re
 import datetime
 from utils.cache import get_closest_embedding
 from utils.CountUtil import count_tokens
+import dotenv
+dotenv.load_dotenv()
+
+add_line  = os.getenv("ADD_LINE")
 
 prompt_template = """
 
@@ -109,11 +113,10 @@ This is the current date: {current_date}
 For game days, you can use the Day column, if you don't have the time of the game. Make sure your date format is consistent with the data.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
-
-
-Assistant: 
-
 """
+
+prompt_template += add_line
+prompt_template += "Assistant:"
 
 
 sql_prompt = PromptTemplate.from_template(prompt_template)
@@ -355,7 +358,7 @@ TwoPointConversionReturns (BIGINT):
 OpponentTwoPointConversionReturns (BIGINT):
 TeamID (BIGINT):
 OpponentID (BIGINT):
-Day (TEXT):
+Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (TEXT): Looks like 2024-01-15T20:15:00
 GlobalGameID (BIGINT):
 GlobalTeamID (BIGINT):

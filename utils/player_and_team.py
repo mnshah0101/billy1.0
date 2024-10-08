@@ -13,6 +13,10 @@ import re
 from utils.cache import get_closest_embedding
 import datetime
 from utils.CountUtil import count_tokens
+import dotenv
+dotenv.load_dotenv()
+
+add_line = os.getenv('ADD_LINE')
 
 prompt_template = """
 
@@ -112,11 +116,12 @@ There could be two players with the same name, so make sure to use the Team colu
 
 This is the current date: {current_date}
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
-
-
-Assistant: 
-
 """
+
+prompt_template += add_line
+prompt_template += "Assistant: "
+
+
 
 
 sql_prompt = PromptTemplate.from_template(prompt_template)
@@ -359,7 +364,7 @@ TwoPointConversionReturns (double precision)
 OpponentTwoPointConversionReturns (double precision)
 TeamID (double precision)
 OpponentID (double precision)
-Day (text)
+Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (text)
 GlobalGameID (double precision)
 GlobalTeamID (double precision)
@@ -558,7 +563,7 @@ FantasyDraftSalary (double precision)
 FantasyDraftPosition (double precision)
 TeamID (bigint)
 OpponentID (bigint)
-Day (text)
+Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (text)
 GlobalGameID (bigint)
 GlobalTeamID (bigint)

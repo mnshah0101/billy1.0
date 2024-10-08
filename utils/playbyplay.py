@@ -11,6 +11,12 @@ import time
 from langchain_anthropic import ChatAnthropic
 from utils.cache import get_closest_embedding
 from utils.CountUtil import count_tokens
+import dotenv
+dotenv.load_dotenv()
+
+add_line = os.getenv('ADD_LINE')
+
+
 
 import re
 prompt_template = ''
@@ -103,10 +109,10 @@ If the question cannot be answered with the data provided, please return the str
 This is a postgres database. Do not create any new columns.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. For example AND "TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur' should be AND ("TeamCoach" = 'Matt LaFleur' OR "OpponentCoach" = 'Matt LaFleur') since the OR should be in parentheses.
 This is the current date: {current_date}.
-
-Assistant: 
-
 """
+
+prompt_template += add_line
+prompt_template += "Assitant: "
 
 
 sql_prompt = PromptTemplate.from_template(prompt_template)
