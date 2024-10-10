@@ -27,6 +27,11 @@ def get_closest_embedding(question, model="text-embedding-3-large", top_k=1):
     # Query Pinecone for the closest match
     results = index.query(
         vector=query_embedding , top_k=top_k, include_metadata=True)
+    
+    print('results')
+    
+    print(results)
+    
 
     # Retrieve the most relevant result's metadata (which contains the SQL query and question)
     if results['matches']:
@@ -42,6 +47,23 @@ def get_closest_embedding(question, model="text-embedding-3-large", top_k=1):
         return matched_question, matched_sql_query
     else:
         print("No relevant embeddings found.")
-        return None
+        default_sql_query = """
+        SELECT
+            SUM(CASE WHEN "Score" > "OpponentScore" THEN 1 ELSE 0 END) AS Wins,
+            SUM(CASE WHEN "Score" < "OpponentScore" THEN 1 ELSE 0 END) AS Losses
+        FROM (
+            SELECT DISTINCT ON ("GameKey")
+                "GameKey", "Team", "Score", "OpponentScore", "PointSpread"
+            FROM teamlog
+            WHERE "Team" = 'Any Team'
+                AND ABS("PointSpread") <= 3
+                AND "SeasonType" = 1
+        ) AS unique_games;
+
+        """
+
+        default_question = "What is the win-loss record for TeamName games where the spread closes at 3 points or fewer?"
+
+        return default_question, default_sql_query
 
 
