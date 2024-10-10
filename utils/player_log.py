@@ -134,7 +134,7 @@ Team (text)
 Opponent (text)
 HomeOrAway (text) - HOME or AWAY
 Number (bigint)
-Name (text) - First Name and Last Name, like "Patrick Mahomes", Do not use the LIKE operator unless necessary, since this can lead to overcounting player logs.
+Name (text) - First Name and Last Name, like "Patrick Mahomes", Do not use the LIKE operator unless necessary, since this can lead to overcounting player logs. Also, be sure to make sure Team is the same for the player you are looking for, since there could be two players with the same name.
 Position (text) - Player's position for this particular game or season. Possible values: C, CB, DB, DE, DE/LB, DL, DT, FB, FS, G, ILB, K, KR, LB, LS, NT, OL, OLB, OT, P, QB, RB, S, SS, T, TE, WR
 PositionCategory (text) - Abbreviation of either Offense, Defense or Special Teams (OFF, DEF, ST)
 Activated (bigint)
