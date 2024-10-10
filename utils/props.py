@@ -17,7 +17,6 @@ add_line = os.getenv('ADD_LINE')
 
 
 props_metadata = """
-GlobalHomeTeamID (bigint) 
 PointSpreadAwayTeamMoneyLine (bigint)
 PointSpreadHomeTeamMoneyLine (bigint) 
 ScoreID (bigint) - Unique identifier for the game score
@@ -30,7 +29,6 @@ BettingEventID (bigint) - Unique identifier for a betting event
 PayoutAmerican (double precision) - Payout in American odds format
 Value (double precision) - The betting line or total for props
 TeamID (double precision) - Unique identifier for a team
-GlobalTeamID (double precision) - Unique identifier for a team across all leagues/sports
 BettingPeriodTypeID (bigint) - Identifier for the betting period (e.g., full game, first half)
 BettingMarketID (bigint) - Unique identifier for a betting market
 PointSpread (double precision) - The point spread for the game
@@ -42,8 +40,6 @@ SeasonType (bigint) - Type of season (e.g., 1 for regular season, 2 for playoffs
 Season (bigint) - The year of the season
 AwayTeamID (bigint) - Unique identifier for the away team
 HomeTeamID (bigint) - Unique identifier for the home team
-GlobalGameID (bigint) - Unique identifier for the game across all leagues/sports
-GlobalAwayTeamID (bigint) - Unique identifier for the away team across all leagues/sports
 SportsBook (text) - Name of the sportsbook offering the odds Could be ['BetMGM', 'Caesars', 'FanDuel', 'Consensus', 'DraftKings', nan]
 BettingMarketType (text) - Could be ['Game Line', 'Player Prop', 'Team Prop', 'Game Prop']
 BettingBetType (text) - Could be ['Total Points', 'Spread', 'Moneyline', 'Total Passing Yards',

@@ -38,7 +38,6 @@ and a table of Prop data with the following schema:
 
 
 <special_instructions_player_log>
-The Team is always short hand, such as WAS for Washington or BAL for Baltimore.
 The name of one of the tables is playerlog and the other is props. 
 Instead of HomeTeam and AwayTeam, reference the Team column and the HomeOrAway Column, The Opponent column will have the opposite side.
 You will have to infer player names from little data from your understanding of the NFL. For example, if the user only says Kelce, you have to infer the name Travis Kelce
@@ -99,7 +98,7 @@ You must list all the sportsbooks (Draftkings, FanDuel, etc) and corresponding s
 Your response will be executed on a database of NFL Betting Prompts and the answer will be returned to the User, so make sure the query is correct and will return the correct information.
 The default SeasonType is Regular Season or 1. If the question is about a different SeasonType, please specify in the query. The default season is 2024.
 To calculate record, use Wins and Losses, and you're going to have to add the most recent game to the Wins and Losses columns to get the current record, as the Wins and Losses columns are cumulative up to the current game for that season and season type.
-
+Don't query on BettingBetType unless the user specifically asks for one of these. This is because not all players or games have these types of bets and you are likely to get an empty response.
 </special_instructions_props>
 
 <question>
@@ -122,7 +121,7 @@ Here is an example response for the question {match_question}:
 
 
 Your response will be executed on a database of NFL Player Logs and the answer will be returned to the User, so make sure the query is correct and will return the correct information.
-You may have to use the "like" operator to match player names, as the user may not provide the full name of the player or the database may have a different format for the player name.
+You may have to use the "like" operator to match player names, as the user may not provide the full name of the player or the database may have a different format for the player name. Please don't use the "like" operator unless necessary since it can lead to overcounting.
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
 
@@ -152,7 +151,7 @@ Team (text)
 Opponent (text)
 HomeOrAway (text) - HOME or AWAY
 Number (bigint)
-Name (text) - First Name and Last Name
+Name (text) - First Name and Last Name, ex: 'Patrick Mahomes', don't use the LIKE operator unless necessary
 Position (text) - Player's position for this particular game or season. Possible values: C, CB, DB, DE, DE/LB, DL, DT, FB, FS, G, ILB, K, KR, LB, LS, NT, OL, OLB, OT, P, QB, RB, S, SS, T, TE, WR
 PositionCategory (text) - Abbreviation of either Offense, Defense or Special Teams (OFF, DEF, ST)
 Activated (bigint)
@@ -299,10 +298,6 @@ TeamID (bigint)
 OpponentID (bigint)
 Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (text)
-GlobalGameID (bigint)
-GlobalTeamID (bigint)
-GlobalOpponentID (bigint)
-ScoreID (bigint)
 FantasyPointsFantasyDraft (double precision)
 OffensiveFumbleRecoveryTouchdowns (double precision)
 SnapCountsConfirmed (bigint)
@@ -349,11 +344,9 @@ SeasonType (bigint) - Type of season (e.g., 1 for regular season, 2 for playoffs
 Season (bigint) - The year of the season
 AwayTeamID (bigint) - Unique identifier for the away team
 HomeTeamID (bigint) - Unique identifier for the home team
-GlobalGameID (bigint) - Unique identifier for the game across all leagues/sports
-GlobalAwayTeamID (bigint) - Unique identifier for the away team across all leagues/sports
 SportsBook (text) - Name of the sportsbook offering the odds Could be ['BetMGM', 'Caesars', 'FanDuel', 'Consensus', 'DraftKings', nan]
 BettingMarketType (text) - Could be ['Game Line', 'Player Prop', 'Team Prop', 'Game Prop']
-BettingBetType (text) - Could be ['Total Points', 'Spread', 'Moneyline', 'Total Passing Yards',
+BettingBetType (text) - Don't query on this unless the user specifically asks for one of these. Could be ['Total Points', 'Spread', 'Moneyline', 'Total Passing Yards',
 'Total Rushing Yards', 'Total Receiving Yards',
 'To Score First Touchdown', 'To Score a Touchdown',
 'To Score a D/ST Touchdown', 'To Score 2+ Touchdowns',

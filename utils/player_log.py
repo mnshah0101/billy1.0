@@ -107,7 +107,7 @@ Here is an example response for the question {matched_question}:
 
 
 Your response will be executed on a database of NFL Player Logs and the answer will be returned to the User, so make sure the query is correct and will return the correct information.
-You may have to use the "like" operator to match player names, as the user may not provide the full name of the player or the database may have a different format for the player name.
+You may have to use the "like" operator to match player names, as the user may not provide the full name of the player or the database may have a different format for the player name. Generally don't use the "like" operator unless necessary, as it can lead to overcounting player logs.
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
 This is the current date: {current_date}
@@ -134,7 +134,7 @@ Team (text)
 Opponent (text)
 HomeOrAway (text) - HOME or AWAY
 Number (bigint)
-Name (text) - First Name and Last Name
+Name (text) - First Name and Last Name, like "Patrick Mahomes", Do not use the LIKE operator unless necessary, since this can lead to overcounting player logs.
 Position (text) - Player's position for this particular game or season. Possible values: C, CB, DB, DE, DE/LB, DL, DT, FB, FS, G, ILB, K, KR, LB, LS, NT, OL, OLB, OT, P, QB, RB, S, SS, T, TE, WR
 PositionCategory (text) - Abbreviation of either Offense, Defense or Special Teams (OFF, DEF, ST)
 Activated (bigint)
@@ -280,11 +280,7 @@ FantasyDraftPosition (double precision)
 TeamID (bigint)
 OpponentID (bigint)
 Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
-DateTime (text)
-GlobalGameID (bigint)
-GlobalTeamID (bigint)
-GlobalOpponentID (bigint)
-ScoreID (bigint)
+DateTime (text): Looks like 2024-10-03T17:00:00, and can be used to determine the exact game time.
 FantasyPointsFantasyDraft (double precision)
 OffensiveFumbleRecoveryTouchdowns (double precision)
 SnapCountsConfirmed (bigint)
@@ -322,7 +318,7 @@ def player_log_get_answer(model, question):
             print("key not given", e)
 
     elif model == 'anthropic':
-        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=0.5)
+        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=0.3)
 
     print(llm)
     llm_chain = sql_prompt | llm

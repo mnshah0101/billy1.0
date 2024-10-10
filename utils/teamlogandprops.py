@@ -128,8 +128,8 @@ Date (TEXT): Format: 'YYYY-MM-DDTHH:MM:SS'. Remember, this is not a Date type, i
 SeasonType (BIGINT): (1=Regular Season, 2=Preseason, 3=Postseason, 4=Offseason, 5=AllStar). The default season type is 1.
 Season (BIGINT): The default season is 2024.
 Week (BIGINT): The week resets for each season type. The default week is 1. Week 17 is the last week of the regular season.
-Team (TEXT):
-Opponent (TEXT): The name of the opponent team.
+Team (TEXT): Short form of the team name (e.g. WAS for Washington, BAL for Baltimore).
+Opponent (TEXT): The name of the opponent team in shorthand.
 HomeOrAway (TEXT): Could be HOME or AWAY.
 Score (BIGINT):
 OpponentScore (BIGINT):
@@ -353,18 +353,12 @@ TeamName (TEXT): The full name of the team (e.g. New England Patriots)
 DayOfWeek (TEXT) - The day of the week this game was played on (e.g. Sunday, Monday)
 PassingDropbacks (BIGINT):
 OpponentPassingDropbacks (BIGINT):
-TeamGameID (BIGINT):
 TwoPointConversionReturns (BIGINT):
 OpponentTwoPointConversionReturns (BIGINT):
 TeamID (BIGINT):
 OpponentID (BIGINT):
 Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (TEXT): Looks like 2024-01-15T20:15:00
-GlobalGameID (BIGINT):
-GlobalTeamID (BIGINT):
-GlobalOpponentID (BIGINT):
-ScoreID (BIGINT):
-outer_key (TEXT):
 HomeConference (TEXT): Can be AFC or NFC.
 HomeDivision (TEXT): Can be North, East, West, South.
 HomeFullName (TEXT):
@@ -379,7 +373,6 @@ AwayDivision (TEXT): Can be North, South, East, or West.
 AwayFullName (TEXT):
 AwayOffensiveScheme (TEXT): (PRO, 2TE, 3WR).
 AwayDefensiveScheme (TEXT): (3-4, 4-3).
-AwayCity (TEXT):
 AwayStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
 Wins (BIGINT): These are the wins up to the current game. They reset each season and each season type.
 Losses (BIGINT): These are the losses up to the current game. They reset each season and each season type.
@@ -389,11 +382,7 @@ Wins_After (BIGINT): These are the wins after the current game. They reset each 
 Losses_After (BIGINT): These are the losses after the current game. They reset each season and each season type.
 OpponentWins_After (BIGINT): These are the opponent's wins after the current game. They reset each season and each season type.
 OpponentLosses_After (BIGINT): These are the opponent's losses after the current game. They reset each season and each season type.
-StadiumID (BIGINT):
 Name (TEXT): Home team Stadium Name.
-City (TEXT): Home team City.
-State (TEXT): Home team State.
-Country (TEXT): Home team Country.
 Capacity (BIGINT): Home team stadium Capacity.
 PlayingSurface (TEXT): Home team stadium PlayingSurface.
 GeoLat (DOUBLE PRECISION): Home team Latitude.
@@ -404,10 +393,8 @@ IsShortWeek (BIGINT): 1 if the team is playing on a short week, 0 if not.
 
 
 props_metadata = """
-GlobalHomeTeamID (bigint) 
 PointSpreadAwayTeamMoneyLine (bigint)
 PointSpreadHomeTeamMoneyLine (bigint) 
-ScoreID (bigint) - Unique identifier for the game score
 Week (bigint) - The week number of the game in the season
 OverPayout (bigint) - Payout for betting over the total points
 UnderPayout (bigint) - Payout for betting under the total points
@@ -417,7 +404,6 @@ BettingEventID (bigint) - Unique identifier for a betting event
 PayoutAmerican (double precision) - Payout in American odds format
 Value (double precision) - The betting line or total for props
 TeamID (double precision) - Unique identifier for a team
-GlobalTeamID (double precision) - Unique identifier for a team across all leagues/sports
 BettingPeriodTypeID (bigint) - Identifier for the betting period (e.g., full game, first half)
 BettingMarketID (bigint) - Unique identifier for a betting market
 PointSpread (double precision) - The point spread for the game
@@ -429,8 +415,6 @@ SeasonType (bigint) - Type of season (e.g., 1 for regular season, 2 for playoffs
 Season (bigint) - The year of the season
 AwayTeamID (bigint) - Unique identifier for the away team
 HomeTeamID (bigint) - Unique identifier for the home team
-GlobalGameID (bigint) - Unique identifier for the game across all leagues/sports
-GlobalAwayTeamID (bigint) - Unique identifier for the away team across all leagues/sports
 SportsBook (text) - Name of the sportsbook offering the odds Could be ['BetMGM', 'Caesars', 'FanDuel', 'Consensus', 'DraftKings', nan]
 BettingMarketType (text) - Could be ['Game Line', 'Player Prop', 'Team Prop', 'Game Prop']
 BettingBetType (text) - Could be ['Total Points', 'Spread', 'Moneyline', 'Total Passing Yards',

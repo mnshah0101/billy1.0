@@ -38,7 +38,6 @@ The query will run on a database of Player Game Logs and Team Game Logs with the
 
 
 <special_instructions>
-The Team is always short hand, such as WAS for Washington or BAL for Baltimore.
 The tables to query are playerlog and teamlog.
 Make sure game keys are unique.
 Instead of HomeTeam and AwayTeam, reference the Team column and the HomeOrAway Column, The Opponent column will have the opposite side.
@@ -78,7 +77,7 @@ To calculate record, use WinsAfter for record after the game and Wins for record
 
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
-Do not use the like operator, as this may lead to false positives.
+Do not use the like operator, as this may lead to overcounting.
 
 The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
 
@@ -134,8 +133,8 @@ Date (text)
 SeasonType (double precision)  - (1=Regular Season, 2=Preseason, 3=Postseason, 4=Offseason, 5=AllStar). The default season type is 1.
 Season (double precision) - The default season is 2023.
 Week (double precision)- The week resets for each season type. The default week is 1. Week 17 is the last week of the regular season.
-Team (text) 
-Opponent (text)
+Team (text) - Short name of the team (e.g. NE for New England Patriots)
+Opponent (text) - Short name of the opponent team.
 HomeOrAway (text) - Could be HOME or AWAY
 Score (double precision)
 OpponentScore (double precision)
@@ -366,18 +365,12 @@ TeamID (double precision)
 OpponentID (double precision)
 Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (text)
-GlobalGameID (double precision)
-GlobalTeamID (double precision)
-GlobalOpponentID (double precision)
-ScoreID (double precision)
-outer_key (bigint)
 HomeConference (text)
 HomeDivision (text)
 HomeFullName (text)
 HomeOffensiveScheme (text)
 HomeDefensiveScheme (text)
 HomeCity (text)
-HomeStadiumDetails (text)
 TeamCoach (text)
 OpponentCoach (text)
 AwayConference (text)
@@ -386,7 +379,6 @@ AwayFullName (text)
 AwayOffensiveScheme (text)
 AwayDefensiveScheme (text)
 AwayCity (text)
-AwayStadiumDetails (text)
 Wins (double precision) - These are the wins up to the current game. They reset each season and each season type.
 Losses (double precision) - These are the losses up to the current game. They reset each season and each season type.
 OpponentWins (double precision) - These are the opponent's wins up to the current game. They reset each season and each season type.
@@ -397,12 +389,7 @@ OpponentWins_After (BIGINT): These are the opponent's wins after the current gam
 OpponentLosses_After (BIGINT): These are the opponent's losses after the current game. They reset each season and each season type.
 IsShortWeek (bigint) - 1 if the team has a short week, 0 otherwise
 StadiumID (bigint)
-Name (text) - Home team Stadium Name
-City (text) - Home team  City
-State (text) - Home team state State
-Country (text) - Home team Country
 Capacity (bigint) - Home team stadium Capacity
-PlayingSurface.1 (text) - Home team stadium PlayingSurface
 GeoLat (double precision) - Home team Latitude
 GeoLong (double precision) - Home team Longitude
 Type (text) - Home team type of stadium (Outdoor or Indoor)
@@ -418,7 +405,7 @@ Team (text)
 Opponent (text)
 HomeOrAway (text) - HOME or AWAY
 Number (bigint)
-Name (text) - First Name and Last Name
+Name (text) - First Name and Last Name, like "Tom Brady", do not use the LIKE operator unless necessary, since it may lead to overcounting.
 Position (text) - Player's position for this particular game or season. Possible values: C, CB, DB, DE, DE/LB, DL, DT, FB, FS, G, ILB, K, KR, LB, LS, NT, OL, OLB, OT, P, QB, RB, S, SS, T, TE, WR
 PositionCategory (text) - Abbreviation of either Offense, Defense or Special Teams (OFF, DEF, ST)
 Activated (bigint)
@@ -565,28 +552,9 @@ TeamID (bigint)
 OpponentID (bigint)
 Day (TEXT): This looks like 2024-10-03T00:00:00, and can be used when you don't know the exact game time. You can extract the day of the week from this, and use it to determine the game day.
 DateTime (text)
-GlobalGameID (bigint)
-GlobalTeamID (bigint)
-GlobalOpponentID (bigint)
-ScoreID (bigint)
 FantasyPointsFantasyDraft (double precision)
 OffensiveFumbleRecoveryTouchdowns (double precision)
 SnapCountsConfirmed (bigint)
-Updated (text)
-ScoringDetails (text) - A JSON array of scoring details if the player scored any points in the game. It looks like this: 
-[{'GameKey': '200230131',
-  'SeasonType': 3,
-  'PlayerID': 8223,
-  'Team': 'SF',
-  'Season': 2002,
-  'Week': 1,
-  'ScoringType': 'RushingTouchdown',
-  'Length': 14,
-  'ScoringDetailID': 292738,
-  'PlayerGameID': 1797109,
-  'ScoringPlayID': 78786}]
-
-source (bigint))
 Wins (double precision) - This is the number of wins the team had in the season up to this point
 OpponentWins (double precision) - This is the number of wins the opponent had in the season up to this point
 Losses (double precision)  - This is the number of losses the team had in the season up to this point

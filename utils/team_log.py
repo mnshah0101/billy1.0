@@ -40,7 +40,6 @@ The query will run on a database of NFL Team Logs with the following schema:
 
 
 <special_instructions>
-The team is always short hand, such as WAS for Washington or BAL for Baltimore.
 The name of the table is teamlog. 
 Instead of HomeTeam and AwayTeam, reference the Team column and the HomeOrAway Column, The Opponent column will have the opposite side.
 To calculate "Against the Spread" (ATS), you need to determine whether a team has covered the point spread in a game. The formula for ATS can be derived using the team score, opponent score, and point spread as follows:
@@ -65,18 +64,15 @@ Only respond with the sql query, no explanation or anything else. Encompass the 
 
 A clever way to get the last game of a team is to do MAX(GameKey), which will give you the last game of the team. 
 
-
 All columns must be surrounded by double quotes, such as "Name" or "Team".
 
 There is no weather column, so use a combination of temperature, humidity, and wind speed to determine the weather conditions of the game.
 
 To calculate record, use WinsAfter for record after the game and Wins for record before the game. The same goes for losses.
 
-The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey")
-
+The games are doubled counted in the TeamLog, so you will have to use DISTINCT to get the unique games for a team. They are double counted in that in one occurrence the home team is the Team and away the Opponent and in the other occurrence the away team is the Team and the home team is the Opponent. You can do this with SELECT DISTINCT ON ("GameKey").
 
 The team in the Team column isn't always the home team, it could be the away team, so use HomeOrAway to determine if the team is the home team or the away team. This is very important for determining who is what team in the game.
-
 
 
 </special_instructions>
@@ -108,17 +104,16 @@ Use the Wins and Losses columns to determine the number of wins and losses for a
 
 
 If the question cannot be answered with the data provided, please return the string "Error: Cannot answer question with data provided."
-
-
-
+Not all Sunday games are played at night.
 Do not use functions that are not available in SQLite. Do not use functions that are not available in SQLite. Do not create new columns, only use what is provided.
 This is a postgres database. Do not create any new columns or tables. Only reference columns that are in the database schema provided.
 This is today's date: {current_date}. If the question mentions today, or tonight or anything of the sort, include this date in the response.
 Make sure you use parentheses correctly in your queries as well as commas to make logical sense. 
+
 """
 
 prompt_template += add_line
-prompt_template += "Assistant:"
+prompt_template += "\nAssistant:"
 
 
 sql_prompt = PromptTemplate.from_template(prompt_template)
@@ -130,8 +125,8 @@ Date (TEXT): Format: 'YYYY-MM-DDTHH:MM:SS'. Remember, this is not a Date type, i
 SeasonType (BIGINT): (1=Regular Season, 2=Preseason, 3=Postseason, 4=Offseason, 5=AllStar). The default season type is 1.
 Season (BIGINT): The default season is 2024.
 Week (BIGINT): The week resets for each season type. The default week is 1. Week 17 is the last week of the regular season.
-Team (TEXT):
-Opponent (TEXT): The name of the opponent team.
+Team (TEXT): Shorthand of the team name (e.g. NE, NYJ, etc.).
+Opponent (TEXT): The name of the opponent team in shorthand.
 HomeOrAway (TEXT): Could be HOME or AWAY.
 Score (BIGINT):
 OpponentScore (BIGINT):
@@ -363,14 +358,10 @@ OpponentID (BIGINT):
 Day (TEXT):
 DateTime (TEXT): Looks like 2024-01-15T20:15:00
 GlobalGameID (BIGINT):
-GlobalTeamID (BIGINT):
-GlobalOpponentID (BIGINT):
-ScoreID (BIGINT):
-outer_key (TEXT):
 HomeConference (TEXT): Can be AFC or NFC.
 HomeDivision (TEXT): Can be North, East, West, South.
 HomeFullName (TEXT):
-HomeOffensiveScheme (TEXT): (3-4, 4-3).
+HomeOffensiveScheme (TEXT): Could be (3-4, 4-3).
 HomeDefensiveScheme (TEXT): (PRO, 2TE, 3WR).
 HomeCity (TEXT):
 HomeStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
@@ -380,8 +371,7 @@ AwayConference (TEXT): Can be AFC or NFC.
 AwayDivision (TEXT): Can be North, South, East, or West.
 AwayFullName (TEXT):
 AwayOffensiveScheme (TEXT): (PRO, 2TE, 3WR).
-AwayDefensiveScheme (TEXT): (3-4, 4-3).
-AwayCity (TEXT):
+AwayDefensiveScheme (TEXT): Could be (3-4, 4-3).
 AwayStadiumDetails (TEXT): A map that looks like "{'StadiumID': 3, 'Name': 'MetLife Stadium', 'City': 'East Rutherford', 'State': 'NJ', 'Country': 'USA', 'Capacity': 82500, 'PlayingSurface': 'Artificial', 'GeoLat': 40.813528, 'GeoLong': -74.074361, 'Type': 'Outdoor'}".
 Wins (BIGINT): These are the wins up to the current game. They reset each season and each season type.
 Losses (BIGINT): These are the losses up to the current game. They reset each season and each season type.
@@ -391,11 +381,7 @@ Wins_After (BIGINT): These are the wins after the current game. They reset each 
 Losses_After (BIGINT): These are the losses after the current game. They reset each season and each season type.
 OpponentWins_After (BIGINT): These are the opponent's wins after the current game. They reset each season and each season type.
 OpponentLosses_After (BIGINT): These are the opponent's losses after the current game. They reset each season and each season type.
-StadiumID (BIGINT):
 Name (TEXT): Home team Stadium Name.
-City (TEXT): Home team City.
-State (TEXT): Home team State.
-Country (TEXT): Home team Country.
 Capacity (BIGINT): Home team stadium Capacity.
 PlayingSurface (TEXT): Home team stadium PlayingSurface.
 GeoLat (DOUBLE PRECISION): Home team Latitude.
