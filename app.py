@@ -116,7 +116,7 @@ def process_database_query(bucket, question):
     print("running up to get_answer")
 
     
-    return get_answer('openai', question, query, result), sql_input_tokens, sql_output_tokens, answer_input_tokens
+    return get_answer('openai', question, query, result), sql_input_tokens, sql_output_tokens, answer_input_tokens, raw_query
 
 
 @socketio.on('billy')
@@ -158,7 +158,7 @@ def chat(data):
     
     try:
 
-        answer_generator, input_sql_tokens, output_sql_tokens, answer_input_tokens = process_database_query(bucket, question)
+        answer_generator, input_sql_tokens, output_sql_tokens, answer_input_tokens, raw_sql_query = process_database_query(bucket, question)
         answer_string = ''
         for next_answer in answer_generator:
             answer_string += next_answer
@@ -188,7 +188,7 @@ def chat(data):
         supabase.table('billy_answers').insert({
             'question': question,
             'bucket': bucket,
-            'sql_query': question,
+            'sql_query': raw_sql_query,
             'answer': answer_string,
             'question_parser_input_tokens': question_chooser_input_count,
             'question_parser_output_tokens': question_chooser_output_count,
