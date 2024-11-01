@@ -98,7 +98,7 @@ def process_database_query(bucket, question):
     
 
 
-    raw_query, sql_input_tokens, sql_output_tokens = get_answer_func('anthropic', question)
+    raw_query, sql_input_tokens, sql_output_tokens = get_answer_func('openai', question)
     if 'error' in raw_query.lower() or 'cannot' in raw_query.lower():
         return process_expert_analysis(question)
 
@@ -134,7 +134,7 @@ def chat(data):
     print(f"IP: {ip}")
     print(f"Session: {session}")
 
-    bucket, question, question_chooser_input_count, question_chooser_output_count = question_chooser('anthropic', message)
+    bucket, question, question_chooser_input_count, question_chooser_output_count = question_chooser('openai', message)
     print(f"Bucket: {bucket}")
     print(f"Question: {question}")
 
