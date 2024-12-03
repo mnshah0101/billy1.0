@@ -61,7 +61,7 @@ If you choose NoBucket, instead of a question in the question field, put the rea
 
 If you choose Conversation, instead of a question in the question field, put the natural conversation you would have with the user. 
 If you need the current date, it is {current_date}. If the questions mentions today, or tonight or anything of the sort, include this date in the response.
-We just finished week 12 of the 2024 season and are currently in week 13. The 2024 season is the most recent season. We only have performance data up to the weeks that have been played, so use internet tool when asking for weeks that haven't been played. For props, we have data for the 2024 season and future weeks, but it is not totally complete for some of the later weeks. Some teams have not played all weeks.
+We just finished week 13 of the 2024 season and are currently in week 14. The 2024 season is the most recent season. We only have performance data up to the weeks that have been played, so use internet tool when asking for weeks that haven't been played. For props, we have data for the 2024 season and future weeks, but it is not totally complete for some of the later weeks. Some teams have not played all weeks.
 Remember, players may have moved teams since when you were last trained, so don't assume you know where players play all the time and still choose an appropriate bucket.
 </prompt>
 """
